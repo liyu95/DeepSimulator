@@ -11,4 +11,5 @@ size = np.array(map(lambda x: float(x.split()[10]), lines))
 # match = df.iloc[:,9].values.astype(float)
 # size = df.iloc[:,10].values.astype(float)
 acc = match/size
+print('Here is the mapping identity:')
 print(acc.mean())

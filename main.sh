@@ -29,7 +29,7 @@ source activate tensorflow
 python2 ./sampling_from_genome/sampling.py \
 	-i $FULLFILE \
 	-p ./$FILENAME/sampled_read \
-	-n 30 \
+	-n 10 \
 	-d 2 \
 	-c 0
 
