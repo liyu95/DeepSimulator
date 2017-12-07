@@ -21,12 +21,12 @@ PREFIX="signal"
 # the input should be a fasta file
 # we should make a tmp directory named after the input file to
 # store the tmp files
-mkdir $FILENAME
+mkdir -p $FILENAME
 
 source activate tensorflow
 # preprocessing, sampling the read
 # satisfy the converage and length distritubtion requirement
-python ./sampling_from_genome/sampling.py \
+python2 ./sampling_from_genome/sampling.py \
 	-i $FULLFILE \
 	-p ./$FILENAME/sampled_read \
 	-n 30 \
@@ -37,9 +37,9 @@ python ./sampling_from_genome/sampling.py \
 # convert the signal to the original range
 # signal duplication 
 # done within pore model
-rm -r ./signal/*
+rm -rf ./signal/*
 cd ./pore_model/src
-python main.py \
+python2 main.py \
 	-i ../../$FILENAME/sampled_read.fasta \
 	-p ../..//signal/$PREFIX -t 20  \
 	-a 0.1 -s 1
@@ -51,7 +51,7 @@ cd ../../
 # 	--perfect 1
 
 # change the signal file to fasta5 file
-rm -r ./fast5/*
+rm -rf ./fast5/*
 signal_dir="./signal/"
 python2 ./signal_to_fast5/fast5_modify_signal.py \
 	-i ./signal_to_fast5/template.fast5 \
@@ -63,7 +63,7 @@ python2 ./signal_to_fast5/fast5_modify_signal.py \
 source activate basecall
 FAST5_DIR="./fast5"
 FASTQ_DIR="./fastq"
-rm -r $FASTQ_DIR/*
+rm -rf $FASTQ_DIR/*
 read_fast5_basecaller.py -i $FAST5_DIR -s $FASTQ_DIR \
 	-c r94_450bps_linear.cfg -o fastq -t 56
 
@@ -76,5 +76,5 @@ cp ./fastq/workspace/pass/*.fastq ./mapping_check/test.fastq
 	./mapping_check/test.fastq > ./mapping_check/mapping.paf
 
 cd mapping_check
-./acc_check.py
+python2 acc_check.py
 cd ..

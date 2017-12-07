@@ -12,6 +12,8 @@ import sys
 import tqdm
 import scipy.stats as st
 
+os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
+
 # the threshold for creat bins
 threshold = 2.5
 # num_bins = 100 + 2

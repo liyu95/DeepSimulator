@@ -11,7 +11,9 @@ The first deep learning based Nanopore simulator which can simulate the process 
 <!-- This the python version should be the same as the Albacore you downloaded -->
 conda create -n basecall python=3.6
 <!-- Install the Albacore using pip -->
-pip install ont_albacore-2.0.2-cp36-cp36m-manylinux1_x86_64.whl --user
+source activate basecall
+pip install ont_albacore-2.0.2-cp36-cp36m-manylinux1_x86_64.whl
+source deactivate
 ```
 
 # Build a virtual environment for the context-independent pore model
