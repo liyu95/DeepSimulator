@@ -167,7 +167,7 @@ if __name__ == '__main__':
 		final_signal= raw_to_true_signal(result_list[i], 
 			seq_list[i], arg.std)
 		if arg.perfect:
-			write_6_times(final_signal, arg.output+'_{}.txt'.format(i))
+			write_6_times(final_signal, arg.output+'_{}.txt'.format(id_list[i]))
 		else:
 			write_alpha_dis(arg.alpha, final_signal, 
 				arg.output+'_{}.txt'.format(id_list[i]))

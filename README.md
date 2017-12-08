@@ -1,10 +1,16 @@
 # DeepSimulator
 The first deep learning based Nanopore simulator which can simulate the process of Nanopore sequencing.
 
+
 # Prerequisites
-1. Python 2.7
-2. Anaconda 2 or Minoconda 2 (This is for build the environment of Albacore. If you choose to use other basecaller, then this one can be ignored.)
-3. Downloaded Albacore (Suppose you downloaded: ont_albacore-2.1.3-cp36-cp36m-manylinux1_x86_64.whl: https://mirror.oxfordnanoportal.com/software/analysis/ont_albacore-2.1.3-cp36-cp36m-manylinux1_x86_64.whl)
+1. Anaconda 2 or Minoconda 2 (https://conda.io/miniconda.html)
+2. Downloaded Albacore (Suppose you downloaded: ont_albacore-2.1.3-cp36-cp36m-manylinux1_x86_64.whl: https://mirror.oxfordnanoportal.com/software/analysis/ont_albacore-2.1.3-cp36-cp36m-manylinux1_x86_64.whl)
+
+# Download the DeepSimulator package
+```
+git clone https://github.com/lykaust15/DeepSimulator.git
+cd ./DeepSimulator/
+```
 
 # Build a virtual environment for Albacore basecalling
 ```
