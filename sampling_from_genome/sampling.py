@@ -36,7 +36,7 @@ def draw_mix_gamma_dis(size):
 	half = int(size/2.0)
 	sample_1 = st.gamma.rvs(2.10650951, 0.63242314, size=half).astype(int)
 	sample = st.gamma.rvs(9.96832633, 0.8928275, size=(size-half)).astype(int)
-	sample = np.concatnate((sample, sample_1))
+	sample = np.concatenate((sample, sample_1))
 	np.random.shuffle(samples)
 	samples = np.clip(samples, 1, len(genome))
 	return sample*1000
