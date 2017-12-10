@@ -27,6 +27,13 @@ def draw_alpha_dis(size):
 	samples = np.clip(samples, 1, len(genome))
 	return samples
 
+
+def draw_expon_dis(size):
+	samples = st.expon.rvs(213.98910256668592, 
+		6972.5319847131141, size=size).astype(int)
+	samples = np.clip(samples, 1, len(genome))
+	return samples
+
 # lambda
 # the actual length should be multiplied  by 1000
 # two mixture gamma distribution with parameters
@@ -110,7 +117,7 @@ if __name__ == '__main__':
 	if arg.dis == 3:
 		read_length = draw_mix_gamma_dis(arg.seq_num)
 	elif arg.dis == 2:
-		read_length = draw_alpha_dis(arg.seq_num)
+		read_length = draw_expon_dis(arg.seq_num)
 	elif arg.dis == 1:
 		read_length = draw_beta_dis(arg.seq_num)
 	elif arg.dis == 0:
