@@ -23,7 +23,7 @@ PREFIX="signal"
 # store the tmp files
 mkdir -p $FILENAME
 
-source activate tensorflow
+source activate tensorflow_cipm
 # preprocessing, sampling the read
 # satisfy the converage and length distritubtion requirement
 python2 ./sampling_from_genome/sampling.py \
@@ -67,7 +67,7 @@ rm -rf $FASTQ_DIR/*
 read_fast5_basecaller.py -i $FAST5_DIR -s $FASTQ_DIR \
 	-c r94_450bps_linear.cfg -o fastq -t 56
 
-source activate tensorflow
+source activate tensorflow_cipm
 
 # check result
 cp ./fastq/workspace/pass/*.fastq $FILENAME
