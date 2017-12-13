@@ -1,4 +1,4 @@
-name: tensorflow_cipm
+name: tensorflow_cdpm
 channels:
 - !!python/unicode
   'defaults'
@@ -114,5 +114,5 @@ dependencies:
   - werkzeug==0.12.2
   - widgetsnbextension==1.2.6
   - tqdm==4.19.4
-prefix: !!python/unicode '/home/liy0f/.conda/envs/tensorflow_cipm'
+prefix: !!python/unicode '/home/liy0f/.conda/envs/tensorflow_cdpm'
 

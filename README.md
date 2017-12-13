@@ -25,6 +25,7 @@ cd ./DeepSimulator/
 
 # Build a virtual environment for the context-independent pore model
 ```
+<!-- This step may take up to 8 mins since it would install all the dependencies -->
 conda env create -f environment.yml
 ```
 
