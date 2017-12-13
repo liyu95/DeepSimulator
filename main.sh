@@ -41,7 +41,7 @@ rm -rf ./signal/*
 cd ./pore_model/src
 python2 main.py \
 	-i ../../$FILENAME/sampled_read.fasta \
-	-p ../..//signal/$PREFIX -t 20  \
+	-p ../../signal/$PREFIX -t 20  \
 	-a 0.1 -s 1
 cd ../../	
 # python ./pore_model/src/main.py \
