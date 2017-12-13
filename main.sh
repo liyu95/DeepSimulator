@@ -38,6 +38,7 @@ python2 ./sampling_from_genome/sampling.py \
 # signal duplication 
 # done within pore model
 rm -rf ./signal/*
+mkdir -p ./signal
 cd ./pore_model/src
 python2 main.py \
 	-i ../../$FILENAME/sampled_read.fasta \
@@ -52,6 +53,7 @@ cd ../../
 
 # change the signal file to fasta5 file
 rm -rf ./fast5/*
+mkdir -p ./fast5
 signal_dir="./signal/"
 python2 ./signal_to_fast5/fast5_modify_signal.py \
 	-i ./signal_to_fast5/template.fast5 \
@@ -64,6 +66,7 @@ source activate basecall
 FAST5_DIR="./fast5"
 FASTQ_DIR="./fastq"
 rm -rf $FASTQ_DIR/*
+mkdir -p $FASTQ_DIR
 read_fast5_basecaller.py -i $FAST5_DIR -s $FASTQ_DIR \
 	-c r94_450bps_linear.cfg -o fastq -t 56
 
