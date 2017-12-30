@@ -34,3 +34,6 @@ conda env create -f environment.yml
 ./main.sh -f ./test_samples/human_single.fasta
 ```
 <!-- Remember to save the fast5 folder since it is consider to be a temp folder and overwritten every time you run the main.sh file -->
+
+
+*This tool is for academic purposes and research use only. Any commercial use is subject for authorization from King Abdullah University of Science and technology “KAUST”. Please contact us at ip@kaust.edu.sa.*
