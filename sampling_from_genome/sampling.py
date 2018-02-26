@@ -37,12 +37,12 @@ def draw_expon_dis(size):
 # lambda
 # the actual length should be multiplied  by 1000
 # two mixture gamma distribution with parameters
-# first gamma: alpha: 2.10650951, rate: 0.63242314
-# second gamma: alpha: 9.96832633, rate: 0.8928275
+# first gamma: alpha: 6.3693711, rate: 0.53834893
+# second gamma: alpha: 1.67638771, rate: 0.22871401
 def draw_mix_gamma_dis(size):
 	half = int(size/2.0)
-	sample_1 = st.gamma.rvs(2.10650951, 0.63242314, size=half)
-	sample = st.gamma.rvs(9.96832633, 0.8928275, size=(size-half))
+	sample_1 = st.gamma.rvs(6.3693711, 0.53834893, size=half)
+	sample = st.gamma.rvs(1.67638771, 0.22871401, size=(size-half))
 	sample = np.concatenate((sample, sample_1))
 	np.random.shuffle(sample)
 	sample = sample*1000
