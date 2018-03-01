@@ -164,3 +164,157 @@ def model_whole_set_check(seq, batch_size=64):
 		result_pred += list(temp)
 	sess.close()
 	return result_pred
+
+def regression_model(train_input, test_input, model_name,
+	load=False, nb_epoch=0):
+	print('We are inside bilstmcrf.')
+	# pdb.set_trace()
+
+	seq_train, fix_train, can_train, label_train = train_input
+	seq_test, fix_test, can_test, label_test = test_input
+
+	fix_train = np.reshape(fix_train, (-1, chunk_size, 1))
+	fix_test = np.reshape(fix_test, (-1, chunk_size, 1))
+
+	can_train = np.reshape(can_train, (-1, chunk_size, 1))
+	can_test = np.reshape(can_test, (-1, chunk_size, 1))
+
+
+	input_seq = tf.placeholder(tf.float32, shape=[None, n_steps, 4])
+	input_seq_3 = tf.placeholder(tf.float32, shape=[None, n_steps-2, 64])
+	input_seq_5 = tf.placeholder(tf.float32, shape=[None, n_steps-4, 1024])
+	kr = tf.placeholder(tf.float32)
+	y = tf.placeholder(tf.float32, shape=output_shape)
+	phase = tf.placeholder(tf.bool, name='phase')
+
+	pred = model_graph(input_seq, input_seq_3, input_seq_5, kr, phase)
+
+	# learning rate decay
+	global_step=tf.Variable(0,trainable=False)
+
+	# weight decay
+	loss = tf.reduce_mean(tf.losses.mean_squared_error(predictions=pred, labels=tf.reshape(y, [-1])))
+
+	update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+	with tf.control_dependencies(update_ops):
+		optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(loss,
+			global_step=global_step)
+
+	# for monitoring
+	tf.summary.scalar('loss', loss)
+	# tf.summary.scalar('accuracy', accuracy)
+	merged = tf.summary.merge_all()
+
+	sess = tf.Session(config=tf.ConfigProto(
+		allow_soft_placement=True))
+
+	# define the tensorboard writer
+	if load==False:
+		os.system('rm {}/train/*'.format(summary_dir))
+		os.system('rm {}/test/*'.format(summary_dir))
+	train_writer = tf.summary.FileWriter(summary_dir+'/train',sess.graph)
+	test_writer = tf.summary.FileWriter(summary_dir+'/test')
+	
+	if debug_mode:
+		sess = tf_debug.LocalCLIDebugWrapperSession(sess)
+	init = tf.global_variables_initializer()
+	sess.run(init)
+	print('Graph initialized!')
+
+	saver = tf.train.Saver()
+
+	if load:
+		saver.restore(sess, model_name)
+
+
+	def model_whole_set_check(seq, fix, can, y_input, batch_size=64):
+		result_pred = list()
+		result_fix = list()
+		result_true = list()
+		seq_obj = batch_object(seq, batch_size)
+		fix_obj = batch_object(fix, batch_size)
+		can_obj = batch_object(can, batch_size)
+		y_obj = batch_object(y_input, batch_size)
+		# pdb.set_trace()
+		for step in range(int(len(seq)/batch_size)):
+			seq_batch = seq_obj.next_batch()
+			fix_batch = fix_obj.next_batch()
+			can_batch = can_obj.next_batch()
+			y_batch = y_obj.next_batch()
+			# y_batch = np.reshape(y_batch, [-1])
+			seq_batch_3 = seq_3_encode_list(seq_batch)
+			seq_batch_5 = seq_5_encode_list(seq_batch)
+			temp = sess.run(pred, 
+				feed_dict={input_seq: seq_batch, 
+				input_seq_3: seq_batch_3, 
+				input_seq_5: seq_batch_5,
+				y: y_batch, kr: 1, phase: 0})
+			result_fix += list(np.reshape(fix_batch,[-1]))
+			result_true += list(np.reshape(y_batch,[-1]))
+			result_pred += list(temp)
+			if step%10==0:
+				print('We are in step %d.'%step)
+		# pdb.set_trace()
+		print('The result of fix to true is {}'.format(mean_squared_error(result_true, 
+			result_fix)))
+		print('The result of pred to true is {}'.format(mean_squared_error(result_pred,
+			result_true)))	
+		return result_pred, result_true
+
+
+	# define the training and test part
+	acc_step = 0
+	#pdb.set_trace()
+	for epoch in range(nb_epoch):
+		for step in range(int(len(seq_train)/batch_size)+1):
+			# seq_train_batch = seq_train_obj.next_batch()
+			# fix_train_batch = fix_train_obj.next_batch()
+			# can_train_batch = can_train_obj.next_batch()
+			# y_train_batch = y_train_obj.next_batch()
+			x_train_list, y_train_batch = generate_random_batch(
+				[seq_train, fix_train, can_train], label_train, batch_size)
+			# y_train_batch = np.reshape(y_train_batch, [-1])
+			seq_train_1 = x_train_list[0]
+			# seq_train_1 = np.reshape(seq_train_1, [-1, 104, 4, 1])
+			seq_train_3 = seq_3_encode_list(x_train_list[0])
+			# seq_train_3 = np.reshape(seq_train_3, [-1, 102, 64, 1])
+			seq_train_5 = seq_5_encode_list(x_train_list[0])
+			# seq_train_5 = np.reshape(seq_train_5, [-1, 100, 1024, 1])
+			sess.run(optimizer, 
+				feed_dict={input_seq: seq_train_1, 
+				input_seq_3: seq_train_3, input_seq_5: seq_train_5,
+				y: y_train_batch, kr: 0.7, phase: 1})
+			
+			if step%output_step == 0:
+				summary, loss_out = sess.run([merged, loss], 
+					feed_dict={input_seq: seq_train_1, 
+					input_seq_3: seq_train_3, input_seq_5: seq_train_5,
+					y: y_train_batch, kr: 1, phase: 0})
+				train_writer.add_summary(summary, acc_step)
+				# print('Train step %d'%step)
+				# print('Train loss: %f, train acc: %f'%(loss_out, acc))
+				print('Train step %d, loss %f'%(step, loss_out))
+				x_test_list, y_test_batch = generate_random_batch(
+					[seq_test, fix_test, can_test], label_test, batch_size)
+				# y_test_batch = np.reshape(y_test_batch, [-1])
+				seq_test_1 = x_test_list[0]
+				# seq_test_1 = np.reshape(seq_test_1, [-1, 104, 4, 1])
+				seq_test_3 = seq_3_encode_list(x_test_list[0])
+				# seq_test_3 = np.reshape(seq_test_3, [-1, 102, 64, 1])
+				seq_test_5 = seq_5_encode_list(x_test_list[0])
+				# seq_test_5 = np.reshape(seq_test_5, [-1, 100, 1024, 1])
+				summary = sess.run(merged, feed_dict ={input_seq: seq_test_1,
+					input_seq_3: seq_test_3, input_seq_5: seq_test_5,
+					y: y_test_batch, kr:1,phase: 0})
+
+				test_writer.add_summary(summary, acc_step)
+				# print('Test loss: %f, test acc: %f'%(loss_out, acc))
+
+			acc_step = acc_step+1
+
+		saver.save(sess, model_name)
+	
+	result_pred, result_true = model_whole_set_check(seq_test, fix_test, can_test,
+		label_test, 256)
+
+	return result_pred, result_true

@@ -61,12 +61,12 @@ def get_data_list(dataset):
 	return data_list
 
 def get_value_all_dataset(dataset):
-	with open('../data/{}_list.data_reso'.format(dataset), 'r') as f:
+	with open('../data/train_file.list', 'r') as f:
 		text = f.read()
 		line_list = text.splitlines()
-	data_list = map(lambda x: x.split()[0], line_list)
-	datafold = '../data/' + dataset + '_simulator_data/'
-	file_list = map(lambda x: datafold + x +'.simulator_data', data_list)
+	data_list = map(lambda x: x.split('/')[-1], line_list)
+	datafold = '../data/inter_data/'
+	file_list = map(lambda x: datafold + x +'.data', data_list)
 	# pdb.set_trace()
 	p = Pool()
 	adp_value = p.map(get_adp_value, file_list)
