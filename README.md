@@ -35,7 +35,7 @@ conda env create -f environment.yml
 ```
 <!-- Remember to save the fast5 folder since it is consider to be a temp folder and overwritten every time you run the main.sh file -->
 
-# Train our model
+# Train customized model
 ## Dependency
 User should make sure the the following dependencies are installed correctly before running the training code.
 
