@@ -38,11 +38,11 @@ conda env create -f environment.yml
 # Train our model
 ## Dependency
 User should make sure the the following dependencies are installed correctly before running the training code.
-```
+
 CUDA (http://docs.nvidia.com/cuda/cuda-installation-guide-linux/#axzz4VZnqTJ2A)
 cuDNN (https://developer.nvidia.com/cudnn)
 Tensorflow (https://www.tensorflow.org/install/install_linux)
-```
+
 
 Our simulator supports training a pore model using a customized dataset. An example is like this:
 ```
