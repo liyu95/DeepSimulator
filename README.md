@@ -51,6 +51,6 @@ Our simulator supports training a pore model using a customized dataset. An exam
 Within the data folder, there are two kinds of data should be provided. The first kind of data is the sequence, and the second kind of data is the corresponding nanopore raw signal. Users can find an example of each file in the 'customized_data' folder.
 After training, an model would be generated in the folder 'pore_model/model'. The user can rename the build-in model as a backup name and the customized model as the original name as the build-in model so that the user do not have to change the code of simulator to use the customized model.
 
-**Notice**: generally, we do not recommend user to train a customized pore model because the data preparation and model training are quite time consuming and there might be some unexpected errors because  of the update of Tensorflow and the dependencies, such as CUDA and cuDNN, which notoriously annoying.
+**Notice**: Generally, we do not recommend user to train a customized pore model because the data preparation and model training are quite time consuming and there might be some unexpected errors because  of the update of Tensorflow and the dependencies, such as CUDA and cuDNN, which notoriously annoying. We would make the model updated to the Nanopore technology development.
 
 *This tool is for academic purposes and research use only. Any commercial use is subject for authorization from King Abdullah University of Science and technology “KAUST”. Please contact us at ip@kaust.edu.sa.*
