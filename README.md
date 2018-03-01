@@ -44,7 +44,7 @@ cuDNN (https://developer.nvidia.com/cudnn)
 Tensorflow (https://www.tensorflow.org/install/install_linux)
 ```
 
-Our simulator also supports training a pore model using a customized dataset. An example is like this:
+Our simulator supports training a pore model using a customized dataset. An example is like this:
 ```
 ./train_pore_model.sh -i data_folder
 ```
