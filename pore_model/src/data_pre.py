@@ -154,34 +154,23 @@ def encoding_all(sequence_list):
 def get_dataset_data(dataset):
 	sequence_list, mer_list, adp_value, fix_value, can_value = get_value_all_dataset(
 		dataset)
-	rev_pro_cod = get_rev_for_code(dataset)
-	sequence_list_for, sequence_list_rev = rev_for_sep(sequence_list,
-		rev_pro_cod)
+	sequence_list_for=sequence_list
 	encoding_for = encoding_all(sequence_list_for)
-	encoding_rev = encoding_all(sequence_list_rev)
 
-	adp_value_for, adp_value_rev = rev_for_sep(adp_value,
-		rev_pro_cod)
+	adp_value_for = adp_value
 	label_for = value_to_label(adp_value_for)
-	label_rev = value_to_label(adp_value_rev)
 
-	fix_value_for, fix_value_rev = rev_for_sep(fix_value,
-		rev_pro_cod)
-	can_value_for, can_value_rev = rev_for_sep(can_value,
-		rev_pro_cod)
+	fix_value_for = fix_value
+	can_value_for = can_value
 
 	# pdb.set_trace()
 	sequence_chunk_for, value_chunk_for, can_chunk_for, label_chunk_for, adp_chunk_for = convert_to_chunk(
 		encoding_for, fix_value_for, can_value_for, label_for, adp_value_for)
-	sequence_chunk_rev, value_chunk_rev, can_chunk_rev, label_chunk_rev, adp_chunk_rev = convert_to_chunk(
-		encoding_rev, fix_value_rev, can_value_rev, label_rev, adp_value_rev)
 
 	for_dict = build_dictionary(data_type, [sequence_chunk_for, value_chunk_for,
 		can_chunk_for, label_chunk_for, adp_chunk_for])
-	rev_dict = build_dictionary(data_type, [sequence_chunk_rev, value_chunk_rev,
-		can_chunk_rev, label_chunk_rev, adp_chunk_rev])
 
-	return (for_dict, rev_dict)
+	return for_dict
 
 if __name__ == '__main__':
 	pass

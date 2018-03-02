@@ -31,4 +31,6 @@ mv ./*.data ./inter_data/
 
 # run the pore model simulation part
 cd ../src
+source activate tensorflow_cdpm
 python2 main_train.py
+source deactivate
