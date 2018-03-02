@@ -25,7 +25,7 @@ rm inter_data/*
 
 while read line; do
 	./trainingdata_generate.sh -i ${line}.fasta \
-		-p ${line}.rawsig > /dev/null
+		-p ${line}.rawsig > log.txt 2> /dev/null
 	#statements
 done <  train_file.list
 mv ./*.data ./inter_data/
