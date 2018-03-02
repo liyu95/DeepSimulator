@@ -261,7 +261,7 @@ def regression_model(train_input, test_input, model_name,
 				train_writer.add_summary(summary, acc_step)
 				# print('Train step %d'%step)
 				# print('Train loss: %f, train acc: %f'%(loss_out, acc))
-				print('Train step %d, loss %f'%(step, loss_out))
+				print('Train step %d, loss %f'%(acc_step, loss_out))
 				x_test_list, y_test_batch = generate_random_batch(
 					[seq_test, fix_test, can_test], label_test, batch_size)
 				# y_test_batch = np.reshape(y_test_batch, [-1])

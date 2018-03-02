@@ -80,7 +80,8 @@ if __name__ == '__main__':
 	test_input = (for_dict['sequence'], for_dict['fix_value'],
 		for_dict['can_value'], for_dict['adp'])
 
-
+	print('Model training start!!')
 	result_pred, result_true = regression_model(train_input, test_input, 
 		'../model/model_customized.ckpt',
 		False, 10000)
+	print('Model training finished!!')
