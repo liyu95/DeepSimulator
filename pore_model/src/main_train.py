@@ -8,6 +8,7 @@ import cPickle
 import gc
 import os
 
+os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
 
 # the threshold for creat bins
 threshold = 2.5
