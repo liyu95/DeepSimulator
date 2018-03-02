@@ -1,0 +1,6 @@
+#==================
+# Running example:
+#==================
+
+./trainingdata_generate.sh -i example/002a08b9-0248-4929-9759-2d5c0942076d.fasta -p example/002a08b9-0248-4929-9759-2d5c0942076d.rawsig
+

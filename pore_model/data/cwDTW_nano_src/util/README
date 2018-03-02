@@ -1,0 +1,63 @@
+#==========
+# Data format:
+#==========
+
+The data format is almost the same as the previous one for the PoreModel project:
+
+
+>58efaba8-9fd4-4de4-ab6a-1f028d40fe87
+GATGCGCAGGCGGGCAAGGCGCCGATCCAACGTGCGGTCGACCGGG
+GATGC   569 |  1.2194220  1.2992288 |  0.0000000  1.0000000 |  0.9217035  0.0000000 |     1
+ATGCG   230 |  0.0167659  0.0568968 |  0.0788741  0.1298773 |  0.0700579  0.1024686 |   369
+TGCGC   921 |  0.2699291  0.3184119 |  0.0581940  0.1062327 |  0.0994419  0.0000000 |     1
+GCGCA   612 | -0.0891625 -0.0525262 | -0.0186096  0.0709212 | -0.1348678  0.2394652 |    48
+CGCAG   402 |  0.9219321  0.9919247 |  0.8998031  1.5644433 |  2.5805616  1.1673902 |    35
+GCAGG   586 | -0.3946997 -0.3681432 | -0.0512682  1.3454056 | -0.1773427  0.7209507 |    93
+CAGGC   297 | -1.4393197 -1.4472255 |  0.1195271  0.7128246 | -1.9051112  0.4376501 |     6
+......
+
+----------------
+[Legend]:
+----------------
+
+the first line is the read ID;
+the 2nd line is the ground-truth DNA sequence of this read;
+
+starting from the 3rd line is the actual data, which can be categorized into three 5 sections: sequence info, context-independent pore model, initialization position description, fragment description, and duration length. 
+
+(a) sequence info:  
+the 1st column shows 5-mer DNA sequence
+the 2nd column shows the corresponding 5-mer ID (from 0 to 1023)
+
+-----------------------
+
+(b) context-independent pore model:
+the 3rd column indicates the original stable pore model, that ALL the same 5-mer will be assigned the same value;
+the 4th column indicates the Z-normalized context-independent pore model, that the same 5-mer in DIFFERENT reads will be assigned DIFFERENT value, but in the SAME read, the value will be the SAME.
+
+-----------------------
+
+(c) initialization position description:
+the 5th column is mean value of the initialization position of this 5-mer fragment.
+the 6th column is the standard variance value of the initialization position of this 5-mer fragment.
+[note]: the initialization position is defined as the range that includes first 1/4 of THIS fragment and last 1/4 of PREVIOUS fragment.
+
+-----------------------
+
+(d) fragment description
+the 7th column indicates the mean value of THIS fragment.
+the 8th column indicates the standard variance value of THIS fragment.
+
+-----------------------
+
+(e) duration length
+the 9th column shows the duration length of THIS fragment.
+
+++++++++++++++++++++++++++++++++++++++++++++++
+
+[Note]:
+
+The reason why we shall consider both the initialization point of a certain fragment is that this point has a STRONG correlation between the mean/std value of the previous and current fragment. If we neglect such information, we won't be able to simulate the raw signal well.
+
+=============================================================
+

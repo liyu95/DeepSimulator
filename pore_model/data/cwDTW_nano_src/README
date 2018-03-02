@@ -1,0 +1,117 @@
+#==========
+# Abstract:
+#==========
+
+Title:
+  Continuous Wavelet Dynamic Time Warping for unbalanced global mapping in nanopore sequencing analysis
+
+
+Author:
+  Renmin Han,
+  Yu Li,
+  Xin Gao,
+  Sheng Wang
+
+
+Contact email:
+  xin.gao@kaust.edu.sa
+  realbigws@gmail.com
+
+
+#=========
+# Install:
+#=========
+
+./install.sh
+
+
+#=======
+# Usage:
+#=======
+
+#---- type ----#
+./cwDTW_nano -h
+
+
+#---- usage ---#
+----------- cwDTW_nano ----------
+version v0.13 (FEB 28 2018)
+-------------------------------------------------------------
+required:
+[-i DNA SEQUENCE][-p NANO SIGNAL][-o OUTPUT]
+optional:
+([-r RADIUS])([-l LEVEL])([-s SCALE])([-k kmer])
+-------------------------------------------------------------
+**** required: ******
+DNA SEQUENCE: (reference) sequence, such as ATCG...;
+NANO SIGNAL:   (nanopore) raw electrical current signal;
+OUTPUT:   nano signal labeling result; if not specified, then no output be generated;
+**** key parameters: ******
+RADIUS:   warp search radius (default 50);
+LEVEL:    sampling level in continous wavelet (default 3);
+SCALE:    base scale in continous wavelet (default sqrt(2));
+kmer:     kmer pore model. 0 for 5mer; 1 for 6mer (default 0);
+
+
+
+#=========
+# Example:
+#=========
+
+#---- align DNA sequence and nanopore raw signal ------#
+./cwDTW_nano -i example/002a08b9-0248-4929-9759-2d5c0942076d.fasta -p example/002a08b9-0248-4929-9759-2d5c0942076d.rawsig -o align_out
+
+
+-------
+[Note]:
+-------
+The input DNA sequence should only contain 'A','T','C', and 'G' nucleotide.
+
+
+
+#===============
+# Output format:
+#===============
+
+e.g., {k}=5
+
+   1     2             3         4            5                6                             7          8
+------------------------------------------------------------------------------------------------------------
+  550   640 |          1          1 |         1.04565        -1.17484          diff:        2.22049   GGAAA
+  433   512 |          2          2 |       -0.560209       -0.531815          diff:       0.028394   GAAAA
+  411     1 |          3          3 |       -0.862165        -1.09529          diff:        0.23312   AAAAC
+  409     1 |          4          3 |       -0.889616        -1.09529          diff:        0.20567   AAAAC
+  408     1 |          5          3 |       -0.903341        -1.09529          diff:       0.191944   AAAAC
+  389     1 |          6          3 |        -1.16412        -1.09529          diff:      0.0688361   AAAAC
+  389     1 |          7          3 |        -1.16412        -1.09529          diff:      0.0688361   AAAAC
+  377     1 |          8          3 |        -1.32883        -1.09529          diff:        0.23354   AAAAC
+  391     1 |          9          3 |        -1.13667        -1.09529          diff:      0.0413855   AAAAC
+
+
+
+---------
+[Legend]:
+---------
+the 1st column is the raw signal value,
+the 2nd column is the k-mer ID 
+  (see [MAP] for the mapping between k-mer DNA and k-mer ID),
+
+the 3rd column shows the mapping of the first position (i.e., on raw signal) starting from 1,
+the 4th column shows the mapping of the second position (i.e., on DNA sequence) starting from 1,
+
+the 5th column indicates the Z-normalized value of raw signal,
+the 6th column indicates the Z-normalized value of genome translated signal 
+  (see [VAL] for the translated signal of each k-mer),
+
+the 7th column illustrates the absolute difference between the two Z-normalized values.
+the 8th column is the kmer for labeling.
+
+
+-------
+[Note]:
+-------
+please find [MAP] in 'src/kmer/{k}mer_index_mapping'
+please find [VAL] in 'src/kmer/{k}mer_index_table.rc'
+
+
+
