@@ -36,21 +36,23 @@ conda env create -f environment.yml
 <!-- Remember to save the fast5 folder since it is consider to be a temp folder and overwritten every time you run the main.sh file -->
 
 # Train customized model
-## Dependency
-User should make sure the the following dependencies are installed correctly before running the training code.
 
-1. CUDA (http://docs.nvidia.com/cuda/cuda-installation-guide-linux/#axzz4VZnqTJ2A)
-2. cuDNN (https://developer.nvidia.com/cudnn)
-3. Tensorflow (https://www.tensorflow.org/install/install_linux)
-
-
-Our simulator supports training a pore model using a customized dataset. An example is like this:
+Our simulator supports training a pore model using a customized dataset. An simple example, which only used the CPU resource, would be like this:
 ```
 ./train_pore_model.sh -i data_folder
 ```
 Within the data folder, there are two kinds of data should be provided. The first kind of data is the sequence, and the second kind of data is the corresponding nanopore raw signal. Users can find an example of each file in the 'customized_data' folder.
-After training, an model would be generated in the folder 'pore_model/model'. The user can rename the build-in model as a backup name and the customized model as the original name as the build-in model so that the user do not have to change the code of simulator to use the customized model.
+After training, an model would be generated in the folder 'pore_model/model'. The user can rename the build-in model (model_reg_seqs_gn179.ckpt\*) as a backup name and the customized model as "model_reg_seqs_gn179.ckpt\*" (all the three files need to be changed accordingly) as the build-in model so that the user do not have to change the code of simulator to use the customized model.
 
 **Notice**: Generally, we do not recommend user to train a customized pore model because the data preparation and model training are quite time consuming and there might be some unexpected errors because  of the update of Tensorflow and the dependencies, such as CUDA and cuDNN, which notoriously annoying. We would make the model updated to the Nanopore technology development.
+
+## Advanced
+The above example only uses CPU, which would take years to train a model. To accelerate the training process and take advantage the computational power of GPU, users can consider use the GPU version Tensorflow. User should make sure the following dependencies are installed correctly before running the training code.
+
+1. CUDA (http://docs.nvidia.com/cuda/cuda-installation-guide-linux/#axzz4VZnqTJ2A)
+2. cuDNN (https://developer.nvidia.com/cudnn)
+3. Tensorflow-gpu (https://www.tensorflow.org/install/install_linux)
+
+Users can refer to the Tensorflow website for more advanced usage of deep learning.
 
 *This tool is for academic purposes and research use only. Any commercial use is subject for authorization from King Abdullah University of Science and technology “KAUST”. Please contact us at ip@kaust.edu.sa.*
