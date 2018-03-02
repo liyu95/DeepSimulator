@@ -37,6 +37,7 @@ conda env create -f environment.yml
 
 # Train customized model
 
+## Simple example
 Our simulator supports training a pore model using a customized dataset. An simple example, which only used the CPU resource, would be like this:
 ```
 ./train_pore_model.sh -i data_folder
@@ -47,12 +48,12 @@ After training, an model would be generated in the folder 'pore_model/model'. Th
 **Notice**: Generally, we do not recommend user to train a customized pore model because the data preparation and model training are quite time consuming and there might be some unexpected errors because  of the update of Tensorflow and the dependencies, such as CUDA and cuDNN, which notoriously annoying. We would make the model updated to the Nanopore technology development.
 
 ## Advanced
-The above example only uses CPU, which would take years to train a model. To accelerate the training process and take advantage the computational power of GPU, users can consider use the GPU version Tensorflow. User should make sure the following dependencies are installed correctly before running the training code.
+The above example only uses CPU, which would take years to train a model. To accelerate the training process and take advantage the computational power of GPU, users can consider using the GPU version of Tensorflow. User should make sure the following dependencies are installed correctly before running the training code on a workstation with GPU card.
 
 1. CUDA (http://docs.nvidia.com/cuda/cuda-installation-guide-linux/#axzz4VZnqTJ2A)
 2. cuDNN (https://developer.nvidia.com/cudnn)
 3. Tensorflow-gpu (https://www.tensorflow.org/install/install_linux)
 
-Users can refer to the Tensorflow website for more advanced usage of deep learning.
+Users can refer to the Tensorflow website (https://www.tensorflow.org/) for more detailed instruction of setting up the environment.
 
 *This tool is for academic purposes and research use only. Any commercial use is subject for authorization from King Abdullah University of Science and technology “KAUST”. Please contact us at ip@kaust.edu.sa.*
