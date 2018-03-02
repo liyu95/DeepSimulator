@@ -13,6 +13,7 @@ done
 
 
 # preprocessing
+echo "Preprocess data..."
 rm ./pore_model/data/example/*
 cp -rf ${INPUT}/* ./pore_model/data/example/
 
@@ -24,10 +25,11 @@ rm inter_data/*
 
 while read line; do
 	./trainingdata_generate.sh -i ${line}.fasta \
-		-p ${line}.rawsig
+		-p ${line}.rawsig > /dev/null
 	#statements
 done <  train_file.list
 mv ./*.data ./inter_data/
+echo "Data preprocessing finished!!"
 
 # run the pore model simulation part
 cd ../src

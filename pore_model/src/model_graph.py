@@ -135,7 +135,7 @@ def seq_5_encode_list(seq_list):
 
 def regression_model(train_input, test_input, model_name,
 	load=False, nb_epoch=0):
-	print('Setting up...')
+	print('Setting up...May take one minute...')
 	# pdb.set_trace()
 
 	seq_train, fix_train, can_train, label_train = train_input
