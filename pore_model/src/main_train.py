@@ -3,7 +3,7 @@ import math
 import numpy as np
 from multiprocessing import Pool
 # from conv_regression import regression_model
-from con_reg_seq import *
+from model_graph import *
 import cPickle
 import gc
 import os
