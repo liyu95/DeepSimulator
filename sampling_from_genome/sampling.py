@@ -96,9 +96,10 @@ def save_file(read_list, output_file):
 
 def replace_n(genome):
 	n_index = [m.start() for m in re.finditer('N', genome)]
-	for ind in n_index:
-		base = random.choice(['A','T','C','G'])
-		genome = genome[:ind]+base+genome[ind+1:]
+	genome_list = np.array([x for x in genome])
+	random_base = np.random.choice(['A','T','C','G'],len(n_index))
+	genome_list[n_index] = random_base
+	genome = ''.join(genome_list)
 	return genome
 	
 if __name__ == '__main__':
