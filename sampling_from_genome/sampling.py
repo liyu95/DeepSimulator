@@ -119,12 +119,19 @@ if __name__ == '__main__':
 	parser.add_argument('-c', action='store', dest='circular',
 		default=False, type=bool, help='if the genome is circular')
 
+	parser.add_argument('-r', action='store', dest='replace',
+		default=False, type=bool, help='if we replace the ns or delete the ns')
+
 	arg = parser.parse_args()
 	genome = load_genome(arg.input)
 
 	# deal with the not standard genome, containing 'N', or in lower case.
 	genome = genome.upper()
-	genome = replace_n(genome)
+
+	if arg.replace:
+		genome = replace_n(genome)
+	else:
+		genome = genome.replace('N','')
 
 	with open(arg.input+'.preprocessed', 'w') as f:
 		f.write(genome)
