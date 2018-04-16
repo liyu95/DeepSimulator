@@ -3,6 +3,8 @@
 import argparse
 import numpy as np
 import scipy.stats as st
+import re
+import random
 # s18
 # beta distribution with parameters
 # 1.7780912583853339, 
@@ -92,8 +94,13 @@ def save_file(read_list, output_file):
 			f.write('>{}\n'.format(i))
 			f.write(read_list[i]+'\n')
 
-
-
+def replace_n(genome):
+	n_index = [m.start() for m in re.finditer('N', genome)]
+	for ind in n_index:
+		base = random.choice(['A','T','C','G'])
+		genome = genome[:ind]+base+genome[ind+1:]
+	return genome
+	
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='sampling read from the \
 		input genome')
@@ -114,6 +121,14 @@ if __name__ == '__main__':
 
 	arg = parser.parse_args()
 	genome = load_genome(arg.input)
+
+	# deal with the not standard genome, containing 'N', or in lower case.
+	genome = genome.upper()
+	genome = replace_n(genome)
+
+	with open(arg.input+'.preprocessed', 'w') as f:
+		f.write(genome)
+
 	if arg.dis == 3:
 		read_length = draw_mix_gamma_dis(arg.seq_num)
 	elif arg.dis == 2:
