@@ -56,7 +56,7 @@ def load_genome(input_file):
 	with open(input_file, 'r') as f:
 		text = f.read()
 		lines = text.splitlines()
-	sequence = lines[1:]
+	sequence = filter(lambda x: '>' not in x, lines)
 	sequence = map(lambda x: x.strip(), sequence)
 	sequence = ''.join(sequence)
 	return sequence
