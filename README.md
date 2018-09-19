@@ -5,15 +5,19 @@ Paper: https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioin
 
 Reference:
 ```
-@article{doi:10.1093/bioinformatics/bty223,
-author = {Li, Yu and Han, Renmin and Bi, Chongwei and Li, Mo and Wang, Sheng and Gao, Xin},
-title = {DeepSimulator: a deep simulator for Nanopore sequencing},
-journal = {Bioinformatics},
-pages = {bty223},
-year = {2018},
-doi = {10.1093/bioinformatics/bty223},
-URL = {http://dx.doi.org/10.1093/bioinformatics/bty223},
+@article{deepsimulator,
+    author = {Li, Yu and Han, Renmin and Bi, Chongwei and Li, Mo and Wang, Sheng and Gao, Xin},
+    title = {DeepSimulator: a deep simulator for Nanopore sequencing},
+    journal = {Bioinformatics},
+    volume = {34},
+    number = {17},
+    pages = {2899-2908},
+    year = {2018},
+    doi = {10.1093/bioinformatics/bty223},
+    URL = {http://dx.doi.org/10.1093/bioinformatics/bty223},
+    eprint = {/oup/backfile/content_public/journal/bioinformatics/34/17/10.1093_bioinformatics_bty223/2/bty223.pdf}
 }
+
 ```
 
 # Usage
