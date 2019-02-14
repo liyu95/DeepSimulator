@@ -20,42 +20,60 @@ Reference:
 
 ```
 
-# Usage
+# Install
 ## Prerequisites
-1. Anaconda 2 or Minoconda 2 (https://conda.io/miniconda.html)
-2. Downloaded Albacore (Suppose you downloaded: ont_albacore-2.3.1-cp36-cp36m-manylinux1_x86_64.whl. https://mirror.oxfordnanoportal.com/software/analysis/ont_albacore-2.3.1-cp36-cp36m-manylinux1_x86_64.whl (If the link does not work, please open an issue))
-
-## Build a virtual environment for Albacore basecalling
+Anaconda2 (https://www.anaconda.com/distribution/) or Minoconda2 (https://conda.io/miniconda.html).
+For example, users may download and install the following Anaconda2 package:
 ```
-<!-- This the python version should be the same as the Albacore you downloaded -->
-conda create -n basecall python=3.6
-<!-- Install the Albacore using pip -->
-<!-- Make sure the .whl file is in the current directory -->
-source activate basecall
-pip install ont_albacore-2.3.1-cp36-cp36m-manylinux1_x86_64.whl
-source deactivate
+wget https://repo.anaconda.com/archive/Anaconda2-2018.12-Linux-x86_64.sh
+bash Anaconda2-2018.12-Linux-x86_64.sh
 ```
 
 ## Download the DeepSimulator package
 ```
-git clone https://github.com/lykaust15/DeepSimulator.git
+git clone https://github.com/realbigws/DeepSimulator.git
 cd ./DeepSimulator/
 ```
 
-## Build a virtual environment for the context-independent pore model
+## Install all required modules
 ```
-<!-- This step may take up to 8 mins since it would install all the dependencies -->
-conda env create -f environment.yml
+./install
 ```
 
-## Run a test
+# Examples
+
+## Context-dependent pore model
 ```
-./main.sh -f ./test_samples/human_single.fasta
+./pore_model.sh example/001c577a-a502-43ef-926a-b883f94d157b.true_fasta 0
 ```
-<!-- Remember to save the fast5 folder since it is consider to be a temp folder and overwritten every time you run the main.sh file -->
+
+## Context-independent kmer pore model (using official 6mer)
+```
+./pore_model.sh example/001c577a-a502-43ef-926a-b883f94d157b.true_fasta 1
+```
+
+## Simulate the signal and read for a given sequence
+```
+./deep_simulator.sh -i example/001c577a-a502-43ef-926a-b883f94d157b.true_fasta -n -1
+```
+
+## Run a test to generate simulated signals and reads for a given genome
+```
+./deep_simulator.sh -i example/artificial_human_chr22.fasta
+```
+
+# Simulated VS original signal
+
+## Simulated signal
+
+![alt text](https://github.com/realbigws/DeepSimulator/blob/master/example/simulated_signal.png)
+
+## Original signal
+![alt text](https://github.com/realbigws/DeepSimulator/blob/master/example/original_signal.png)
+
 
 ## Control the behavior of DeepSimulator
-One can control the behavior of DeepSimulator, including the number of reads generated or the accuracy, *etc.*, by changing the ```main.sh``` file. Detailed descriptions of the parameters in ```main.sh``` file can be refered to Section S4 in [Supplementary material of DeepSimulator](https://oup.silverchair-cdn.com/oup/backfile/Content_public/Journal/bioinformatics/34/17/10.1093_bioinformatics_bty223/2/bty223_supplemental_materials.pdf?Expires=2147483647&Signature=v5FSUbbU4eVfQdIo3H3Xrsq6CFVh8azonSxGg1WaAL35maQ0zqIPzdRPTTGUUhlzkLYBnU3Fi4G1DRcXc5YDD4Ea~8ic56zpjBNWQ4qqSZabjH9XwTFyPTbh6IKaHkULi9zKfSl02MxxXfqEJ0Xi72AKRv0Up4j~baWrfyUEKYtEVkzJbpbyAsnZhvPh2WSbFXyPhRhBn~fH9XfrEO9hbMQPSrT9di2Ho85ZBbZ2xS0P~J8sZyi91ulXQHfYSH5rbdaTNAAxRCVbLQUi3iKbJFE5Bl0de66w0mdjfgIZGqrBY9uPoXwW4MYf6H7OwmVXnDc-sjoe73UxO4xHRF17Ag__&Key-Pair-Id=APKAIE5G5CRDK6RD3PGA)
+One can control the behavior of DeepSimulator, including the length distribution of the reads or the accuracy, *etc.*, by using different options in ```deep_simulator.sh```. Detailed descriptions of the parameters in ```deep_simulator.sh``` file can be refered to Section S4 in [Supplementary material of DeepSimulator](https://oup.silverchair-cdn.com/oup/backfile/Content_public/Journal/bioinformatics/34/17/10.1093_bioinformatics_bty223/2/bty223_supplemental_materials.pdf?Expires=2147483647&Signature=v5FSUbbU4eVfQdIo3H3Xrsq6CFVh8azonSxGg1WaAL35maQ0zqIPzdRPTTGUUhlzkLYBnU3Fi4G1DRcXc5YDD4Ea~8ic56zpjBNWQ4qqSZabjH9XwTFyPTbh6IKaHkULi9zKfSl02MxxXfqEJ0Xi72AKRv0Up4j~baWrfyUEKYtEVkzJbpbyAsnZhvPh2WSbFXyPhRhBn~fH9XfrEO9hbMQPSrT9di2Ho85ZBbZ2xS0P~J8sZyi91ulXQHfYSH5rbdaTNAAxRCVbLQUi3iKbJFE5Bl0de66w0mdjfgIZGqrBY9uPoXwW4MYf6H7OwmVXnDc-sjoe73UxO4xHRF17Ag__&Key-Pair-Id=APKAIE5G5CRDK6RD3PGA)
 
 # Train customized model
 
