@@ -28,7 +28,9 @@ output_step = 100
 n_hidden = 25*4
 debug_mode = False
 
-summary_dir = '../log/log_reg_seq'
+summary_dir = os.environ['DeepSimulatorHome'] + '/pore_model/log/log_reg_seq'
+model_dir = os.environ['DeepSimulatorHome'] + '/pore_model/model/model_reg_seqs_gn179.ckpt'
+
 
 def check_mkdir(summary_dir):
 	if not os.path.isdir(summary_dir):
@@ -142,13 +144,15 @@ phase = tf.placeholder(tf.bool, name='phase')
 
 pred = model_graph(input_seq, input_seq_3, input_seq_5, kr, phase)
 
+
 def model_whole_set_check(seq, batch_size=64):
 	sess = tf.Session(config=tf.ConfigProto(
 		allow_soft_placement=True))
 	sess.run(tf.global_variables_initializer())
 	saver = tf.train.Saver()
-	saver.restore(sess, '../model/model_reg_seqs_gn179.ckpt')
-	# print('Model loaded!')
+	saver.restore(sess, model_dir)
+	#print((str)(model_dir))
+	#print('Model loaded!')
 	result_pred = list()
 	seq_obj = batch_object(seq, batch_size)
 	for step in range(int(len(seq)/batch_size)+1):
