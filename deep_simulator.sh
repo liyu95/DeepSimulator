@@ -6,7 +6,7 @@ function usage()
 	echo "DeepSimulator v0.20 [Feb-12-2019] "
 	echo "    A Deep Learning based Nanopore simulator which can simulate the process of Nanopore sequencing. "
 	echo ""
-	echo "USAGE:  ./deep_simulator.sh <-i input_genome> [-n simu_read_num] [-o output_root] [-c CPU_num] [-m sample_mode] [-M simulator] "
+	echo "USAGE:  ./deep_simulator.sh <-i input_genome> [-n simu_read_num] [-o out_root] [-c CPU_num] [-m sample_mode] [-M simulator] "
 	echo "                       [-C cirular_genome] [-e event_std] [-f filter_freq] [-s noise_std] [-P perfect] [-I independ] [-H home] "
 	echo "Options:"
 	echo ""
@@ -17,7 +17,7 @@ function usage()
 	echo "-n simu_read_num  : the number of reads need to be simulated. [default = 100] "
 	echo "                    Set -1 to simulate the whole input sequence without cut (not suitable for genome-level). "
 	echo ""
-	echo "-o output_root    : Default output would the current directory. [default = './\${input_name}_DeepSimu'] "
+	echo "-o out_root    : Default output would the current directory. [default = './\${input_name}_DeepSimu'] "
 	echo ""
 	echo "-c CPU_num        : Number of processors. [default = 8]"
 	echo ""
@@ -65,7 +65,7 @@ fi
 
 #------- required arguments ------------#
 FULLFILE=""
-output_root=""
+out_root=""
 
 #------- optioanl parameters -----------#
 SAMPLE_NUM=100      #-> by default, we simulate 100 reads
@@ -96,7 +96,7 @@ do
 		;;
 	#-> optional arguments
 	o)
-		output_root=$OPTARG
+		out_root=$OPTARG
 		;;
 	n)
 		SAMPLE_NUM=$OPTARG
