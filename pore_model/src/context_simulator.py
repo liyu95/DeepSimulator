@@ -48,9 +48,11 @@ def convert_to_input(seq_list):
 #----------- main program: sequence to raw signal --------------#
 # default parameters:
 #     repeat_alpha=0.1
+#     repeat_more=1
 #     filter_freq=850
 #     noise_std=1.5
-def raw_to_true_signal(result_pred, sequence, repeat_alpha, filter_freq, noise_std, perfect, p_len):
+def raw_to_true_signal(result_pred, sequence, 
+    repeat_alpha=0.1, repeat_more=1, filter_freq=850, noise_std=1.5, perfect=0, p_len=1):
     result_pred = np.array(result_pred)
     result_pred = result_pred.flatten()
     final_result = result_pred[:len(sequence)]   #-> this is Z-score
@@ -60,7 +62,7 @@ def raw_to_true_signal(result_pred, sequence, repeat_alpha, filter_freq, noise_s
         final_result, final_ali = repeat_k_time(p_len, final_result)
     else:
         #-> 1. repeat N times
-        final_result, final_ali, _ = repeat_n_time(repeat_alpha, final_result)
+        final_result, final_ali, _ = repeat_n_time(repeat_alpha, final_result, repeat_more)
         #-> 2. low pass filter
         if filter_freq>0:
             h,h_start,N = low_pass_filter(4000.0, filter_freq, 40.0)
@@ -97,6 +99,8 @@ if __name__ == '__main__':
 		simulate the real case, 0 would give distribution whose basecalling \
 		result is slightly worse than the real case, 1 would give the almost \
 		perfect basecalling result using Albacore', default=0.1)
+	parser.add_argument('-u', action='store', dest='more',
+		type=int, help='tune sampling rate to around 8. (default is 1)', default=1)
 	parser.add_argument('-s', action='store', dest='std',
 		type=float, help='set the std of the signal. \
 		The higher the value, the blurred the signal. (default is 1.5)',
@@ -129,8 +133,9 @@ if __name__ == '__main__':
 
 	#---------- output results -----------#
 	for i in range(len(result_list)):
-		final_signal, final_ali = raw_to_true_signal(result_list[i], 
-			seq_list[i], arg.alpha, arg.freq, arg.std, arg.perfect, arg.perflen)
+		final_signal, final_ali = raw_to_true_signal(result_list[i],seq_list[i], 
+			repeat_alpha=arg.alpha, repeat_more=arg.more,
+			filter_freq=arg.freq, noise_std=arg.std, perfect=arg.perfect, p_len=arg.perflen)
 		write_output(final_signal, arg.output+'_{}.txt'.format(id_list[i]))
 		if not arg.perfect:
 			write_alignment(final_ali, arg.alignment+'_{}.ali'.format(id_list[i]))

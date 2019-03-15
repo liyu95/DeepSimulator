@@ -48,11 +48,13 @@ def sequence_official_poremodel(sequence, kmer_poremodel):
 #----------- main program: sequence to raw signal --------------#
 # default parameters: 
 #     repeat_alpha=0.1
+#     repeat_more=1
 #     event_std=1.0
 #     filter_freq=850
 #     noise_std=1.5
 def sequence_to_true_signal(input_part, kmer_poremodel='null', perfect=0, p_len=1,
-    repeat_alpha=0.1, event_std=1.0, filter_freq=850, noise_std=1.5, sigroot='signal',aliroot='align' ):
+    repeat_alpha=0.1, repeat_more=1, event_std=1.0, filter_freq=850, noise_std=1.5, 
+    sigroot='signal',aliroot='align' ):
     #--- unzip input args ---#
     sequence = input_part[0]
     seq_name = input_part[1]
@@ -63,7 +65,7 @@ def sequence_to_true_signal(input_part, kmer_poremodel='null', perfect=0, p_len=
         final_result, final_ali = repeat_k_time(p_len, mean_result)
     else:
         #-> 1. repeat N times 
-        indep_result, final_ali, event_idx = repeat_n_time(repeat_alpha, mean_result)
+        indep_result, final_ali, event_idx = repeat_n_time(repeat_alpha, mean_result, repeat_more)
         event_std = np.random.uniform(-1*event_std*std_result[event_idx], event_std*std_result[event_idx])
         final_result = mean_result[event_idx] + event_std
         #-> 2. low pass filter
@@ -104,6 +106,8 @@ if __name__ == '__main__':
         simulate the real case, 0 would give distribution whose basecalling \
         result is slightly worse than the real case, 1 would give the almost \
         perfect basecalling result using Albacore', default=0.1)
+    parser.add_argument('-u', action='store', dest='more',
+        type=int, help='tune sampling rate to around 8. (default is 1)', default=1)
     parser.add_argument('-e', action='store', dest='event_std',
         type=float, help='set the std of the event. \
         The higher the value, the more variable the event. (default is 1.0)',
@@ -136,9 +140,9 @@ if __name__ == '__main__':
 
     #---------- partial function ---------#
     func=partial(sequence_to_true_signal, \
-    	kmer_poremodel=kmer_poremodel, perfect=arg.perfect, p_len=arg.perflen, \
-    	event_std=arg.event_std, filter_freq=arg.filter_freq, noise_std=arg.noise_std, \
-        repeat_alpha=arg.alpha, sigroot=arg.output, aliroot=arg.alignment)
+        kmer_poremodel=kmer_poremodel, perfect=arg.perfect, p_len=arg.perflen, \
+        event_std=arg.event_std, filter_freq=arg.filter_freq, noise_std=arg.noise_std, \
+        repeat_alpha=arg.alpha, repeat_more=arg.more, sigroot=arg.output, aliroot=arg.alignment)
 
     #---------- multi process ------------#
     p = Pool(arg.threads)

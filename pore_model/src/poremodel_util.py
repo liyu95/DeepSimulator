@@ -37,23 +37,24 @@ def write_alignment(result, file_name):
 
 
 #---------- step 2: repeat length sample -----------#
-def rep_rvs(size,a):
+def rep_rvs(size,a, more):
     a = a*5
     array_1 = np.ones(int(size*(0.075-0.015*a))).astype(int)
     samples = st.alpha.rvs(3.3928495261646932+a,
         -7.6451557771999035+(2*a), 50.873948369526737,
         size=(size-int(size*(0.075-0.015*a)))).astype(int)
     samples = np.concatenate((samples, array_1), 0)
-    addi = np.array(abs(np.random.normal(2,1,size))).astype(int)
-    samples[samples<2] = 2
+    samples[samples<1] = 1
     samples[samples>40] = 40
-    samples[samples<8] += addi[samples<8]
-    np.random.shuffle(samples)
-    samples[samples<8] += addi[samples<8]
+    if more == 1:
+        addi = np.array(abs(np.random.normal(2,1,size))).astype(int)
+        samples[samples<8] += addi[samples<8]
+        np.random.shuffle(samples)
+        samples[samples<8] += addi[samples<8]
     return samples
 
-def repeat_n_time(a, result):
-    rep_times = rep_rvs(len(result), a)
+def repeat_n_time(a, result, more):
+    rep_times = rep_rvs(len(result), a, more)
     out = list()
     ali = list()
     pos = 0
