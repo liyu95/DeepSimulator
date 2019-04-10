@@ -21,7 +21,7 @@ function usage()
 	echo ""
 	echo "-c CPU_num        : Number of processors. [default = 8]"
 	echo ""
-	echo "-m sample_mode    : choose from the following distribution for the read length. [default = 2] "
+	echo "-m sample_mode    : choose from the following distribution for the read length. [default = 3] "
 	echo "                    1: beta_distribution, 2: alpha_distribution, 3: mixed_gamma_dis. "
 	echo ""
 	echo "-M simulator      : choose either context-dependent(0) or context-independent(1) simulator. [default = 1] "
@@ -76,7 +76,7 @@ SAMPLE_NUM=100      #-> by default, we simulate 100 reads
 #-> multiprocess
 THREAD_NUM=8        #-> this is the thread (or, CPU) number
 #-> simulator mode
-SAMPLE_MODE=2       #-> choose from the following distribution: 1: beta_distribution, 2: alpha_distribution, 3: mixed_gamma_dis. default: [2]
+SAMPLE_MODE=3       #-> choose from the following distribution: 1: beta_distribution, 2: alpha_distribution, 3: mixed_gamma_dis. default: [3]
 SIMULATOR_MODE=1    #-> choose from the following type of simulator: 0: context-dependent, 1: context-independent. default: [1]
 GENOME_CIRCULAR=0   #-> 0 for NOT circular and 1 for circular. default: [0]
 TUNE_SAMPLING=1     #-> 1 for tuning sampling rate to around 8. default: [1]
