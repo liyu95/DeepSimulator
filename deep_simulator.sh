@@ -21,6 +21,8 @@ function usage()
 	echo ""
 	echo "-c CPU_num        : Number of processors. [default = 8]"
 	echo ""
+	echo "-S Random_seed    : Random seed for controling the read sampling process. [default = 0]"
+	echo ""
 	echo "-m sample_mode    : choose from the following distribution for the read length. [default = 3] "
 	echo "                    1: beta_distribution, 2: alpha_distribution, 3: mixed_gamma_dis. "
 	echo ""
@@ -81,6 +83,7 @@ SIMULATOR_MODE=1    #-> choose from the following type of simulator: 0: context-
 GENOME_CIRCULAR=0   #-> 0 for NOT circular and 1 for circular. default: [0]
 TUNE_SAMPLING=1     #-> 1 for tuning sampling rate to around 8. default: [1]
 #-> read geneartion
+RANDOM_SEED=0       #-> random seed for controling sampling, for reproducibility. default: [0]
 EVENT_STD=1.0       #-> set the std of random noise of the event, default = 1.0
 FILTER_FREQ=850     #-> set the frequency for the low-pass filter. default = 850
 NOISE_STD=1.5       #-> set the std of random noise of the signal, default = 1.5
@@ -93,7 +96,7 @@ home=$curdir
 
 
 #------- parse arguments ---------------#
-while getopts ":i:n:o:c:m:M:C:u:e:f:s:P:H:" opt;
+while getopts ":i:n:o:c:S:m:M:C:u:e:f:s:P:H:" opt;
 do
 	case $opt in
 	#-> required arguments
@@ -109,6 +112,9 @@ do
 		;;
 	c)
 		THREAD_NUM=$OPTARG
+		;;
+	S)
+		RANDOM_SEED=$OPTARG
 		;;
 	#-> simulator mode
 	m)
@@ -224,6 +230,7 @@ then
 		-p $FILENAME/sampled_read \
 		-n $SAMPLE_NUM \
 		-d $SAMPLE_MODE \
+		-S $RANDOM_SEED \
 		$circular
 	source deactivate
 else

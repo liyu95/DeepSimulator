@@ -10,9 +10,9 @@ import random
 # 7.8927794827841975, 
 # 316.75817723758286, 
 # 34191.25716704056
-def draw_beta_dis(size):
+def draw_beta_dis(size, seed):
 	samples = st.beta.rvs(1.778, 7.892, 316.758, 
-		34191.257, size=size)
+		34191.257, size=size, random_state=seed)
 	samples = samples.astype(int)
 	samples = np.clip(samples, 1, len(genome))
 	return samples
@@ -22,16 +22,16 @@ def draw_beta_dis(size):
 # 0.0058193182047962533, 
 # -49.180482198937398, 
 # 1663.9103931473874
-def draw_alpha_dis(size):
+def draw_alpha_dis(size, seed):
 	samples = st.alpha.rvs(0.00582,-49.1805,1663.91,
-		size=size).astype(int)
+		size=size, random_state=seed).astype(int)
 	samples = np.clip(samples, 1, len(genome))
 	return samples
 
 
-def draw_expon_dis(size):
+def draw_expon_dis(size, seed):
 	samples = st.expon.rvs(213.98910256668592, 
-		6972.5319847131141, size=size).astype(int)
+		6972.5319847131141, size=size, random_state=seed).astype(int)
 	samples = np.clip(samples, 1, len(genome))
 	return samples
 
@@ -40,11 +40,14 @@ def draw_expon_dis(size):
 # two mixture gamma distribution with parameters
 # first gamma: alpha: 6.3693711, rate: 0.53834893
 # second gamma: alpha: 1.67638771, rate: 0.22871401
-def draw_mix_gamma_dis(size):
+def draw_mix_gamma_dis(size, seed):
 	half = int(size/2.0)
-	sample_1 = st.gamma.rvs(6.3693711, 0.53834893, size=half)
-	sample = st.gamma.rvs(1.67638771, 0.22871401, size=(size-half))
+	sample_1 = st.gamma.rvs(6.3693711, 0.53834893, size=half,
+		random_state=seed)
+	sample = st.gamma.rvs(1.67638771, 0.22871401, size=(size-half),
+		random_state=seed)
 	sample = np.concatenate((sample, sample_1))
+	np.random.seed(seed)
 	np.random.shuffle(sample)
 	sample = sample*1000
 	sample = sample.astype(int)
@@ -74,7 +77,8 @@ def sampling_single_lin(pair):
 	start_point, read_length = pair
 	return genome[start_point: start_point+read_length]
 
-def sampling(read_length, circular):
+def sampling(read_length, circular, seed):
+	np.random.seed(seed)
 	read_list = list()
 	if circular:
 		start_point = np.random.choice(len(genome), len(read_length),
@@ -104,6 +108,8 @@ if __name__ == '__main__':
 		help='prefix the output file')
 	parser.add_argument('-n', action='store', dest='seq_num', required=True,
 		type=int, help='the number of output sequence')
+	parser.add_argument('-S', action='store', dest='seed', type=int, default=0,
+		help='the random seed, for reproducibility')
 	parser.add_argument('-d', action='store', dest='dis', default=3,
 		type=int, help='choose from the following distribution: \
 		1: beta_distribution, 2: alpha_distribution, 3: mixed_gamma_dis \
@@ -114,20 +120,21 @@ if __name__ == '__main__':
 		default=False, type=bool, help='if the genome is circular')
 
 	arg = parser.parse_args()
+	random.seed(arg.seed)
 	genome = load_genome(arg.input)
 
 	if arg.dis == 3:
-		read_length = draw_mix_gamma_dis(arg.seq_num)
+		read_length = draw_mix_gamma_dis(arg.seq_num, arg.seed)
 	elif arg.dis == 2:
-		read_length = draw_expon_dis(arg.seq_num)
+		read_length = draw_expon_dis(arg.seq_num, arg.seed)
 	elif arg.dis == 1:
-		read_length = draw_beta_dis(arg.seq_num)
+		read_length = draw_beta_dis(arg.seq_num, arg.seed)
 	elif arg.dis == 0:
 		print('This is for testing only')
 		read_length = np.random.normal(5, 1, arg.seq_num)
 		read_length = read_length.astype(int)
 	else:
 		print('Invalid distribution, we would use mixed gamma distribution')
-		read_length = draw_mix_gamma_dis(arg.seq_num)
-	read_list = sampling(read_length, arg.circular)
+		read_length = draw_mix_gamma_dis(arg.seq_num, arg.seed)
+	read_list = sampling(read_length, arg.circular, arg.seed)
 	save_file(read_list, arg.output+'.fasta')
