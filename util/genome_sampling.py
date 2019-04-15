@@ -110,6 +110,9 @@ if __name__ == '__main__':
 		type=int, help='the number of output sequence')
 	parser.add_argument('-S', action='store', dest='seed', type=int, default=0,
 		help='the random seed, for reproducibility')
+	parser.add_argument('-K', action='store', dest='coverage', type=int, default=0,
+		help='spacify the simulation coverage, the nubmer of read will be \
+		calculated. We use the larger one compared with seq_num.')
 	parser.add_argument('-d', action='store', dest='dis', default=3,
 		type=int, help='choose from the following distribution: \
 		1: beta_distribution, 2: alpha_distribution, 3: mixed_gamma_dis \
@@ -122,19 +125,23 @@ if __name__ == '__main__':
 	arg = parser.parse_args()
 	random.seed(arg.seed)
 	genome = load_genome(arg.input)
+	seq_num_c = int(arg.coverage*len(genome)/4400)
+	seq_num = arg.seq_num
+	if seq_num_c>seq_num:
+		seq_num = seq_num_c
 
 	if arg.dis == 3:
-		read_length = draw_mix_gamma_dis(arg.seq_num, arg.seed)
+		read_length = draw_mix_gamma_dis(seq_num, arg.seed)
 	elif arg.dis == 2:
-		read_length = draw_expon_dis(arg.seq_num, arg.seed)
+		read_length = draw_expon_dis(seq_num, arg.seed)
 	elif arg.dis == 1:
-		read_length = draw_beta_dis(arg.seq_num, arg.seed)
+		read_length = draw_beta_dis(seq_num, arg.seed)
 	elif arg.dis == 0:
 		print('This is for testing only')
-		read_length = np.random.normal(5, 1, arg.seq_num)
+		read_length = np.random.normal(5, 1, seq_num)
 		read_length = read_length.astype(int)
 	else:
 		print('Invalid distribution, we would use mixed gamma distribution')
-		read_length = draw_mix_gamma_dis(arg.seq_num, arg.seed)
+		read_length = draw_mix_gamma_dis(seq_num, arg.seed)
 	read_list = sampling(read_length, arg.circular, arg.seed)
 	save_file(read_list, arg.output+'.fasta')

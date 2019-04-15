@@ -17,6 +17,8 @@ function usage()
 	echo "-n simu_read_num  : the number of reads need to be simulated. [default = 100] "
 	echo "                    Set -1 to simulate the whole input sequence without cut (not suitable for genome-level). "
 	echo ""
+	echo "-K coverage       : this parameter is converted to number of read in the program, if both K and n are given, we use the larger one."
+	echo ""
 	echo "-o out_root       : Default output would the current directory. [default = './\${input_name}_DeepSimu'] "
 	echo ""
 	echo "-c CPU_num        : Number of processors. [default = 8]"
@@ -75,6 +77,7 @@ out_root=""
 
 #------- optioanl parameters -----------#
 SAMPLE_NUM=100      #-> by default, we simulate 100 reads
+COVERAGE=0          #-> the coverage parameter, we simulate read whichever the larger, SAMPLE_NUM or the number computed from coverage
 #-> multiprocess
 THREAD_NUM=8        #-> this is the thread (or, CPU) number
 #-> simulator mode
@@ -96,7 +99,7 @@ home=$curdir
 
 
 #------- parse arguments ---------------#
-while getopts ":i:n:o:c:S:m:M:C:u:e:f:s:P:H:" opt;
+while getopts ":i:n:K:o:c:S:m:M:C:u:e:f:s:P:H:" opt;
 do
 	case $opt in
 	#-> required arguments
@@ -109,6 +112,9 @@ do
 		;;
 	n)
 		SAMPLE_NUM=$OPTARG
+		;;
+	K)
+		COVERAGE=$OPTARG
 		;;
 	c)
 		THREAD_NUM=$OPTARG
@@ -229,6 +235,7 @@ then
 		-i $FILENAME/processed_genome \
 		-p $FILENAME/sampled_read \
 		-n $SAMPLE_NUM \
+		-K $COVERAGE \
 		-d $SAMPLE_MODE \
 		-S $RANDOM_SEED \
 		$circular
