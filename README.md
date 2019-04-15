@@ -69,6 +69,13 @@ cd ./DeepSimulator/
 ./deep_simulator.sh -i example/artificial_human_chr22.fasta
 ```
 
+# Explanation of the content in the output folder
+Within the output folder, there are several folders and files. If you run
+```
+./deep_simulator.sh -i example/artificial_human_chr22.fasta
+```
+then, within the folder 'artificial_human_chr22', there are five files: 'processed_genome', 'sampled_read.fasta', 'test.fastq', 'mapping.paf', and 'accuracy'. There are four folders: 'signal', 'align', 'fast5', 'fastq'. Let us explain all of them in chronological order. After receiving the original input genome file, we first perform some essential preprocessing, resulting in the file 'processed_genome'. After that, we run the first module, sampling reads from the processed genome, resulting in 'sampled_read.fasta'. Then, the 'sampled_read.fasta' will go through the pore model, resulting in 'signal' and 'align' folders. In the 'signal' folder, we store the simulated signals for each of the sampled reads. In the 'align' folder, we store the repeat times for each position in each read. Then, we pack the raw signals into the fast5 files, resulting in the folder, 'fast5', which can be the inputs of the basecaller, Albacore. 'fastq' stores the output of the basecaller. We collect the results from the 'fastq' folder into the file 'test.fastq'. Finally, we check the accuracy using minimap2, whose output is 'mapping.paf'. File 'accuracy' stores the accuracy for later reference.
+
 # Simulated VS original signal
 
 ## Simulated signal
