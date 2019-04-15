@@ -52,7 +52,8 @@ def convert_to_input(seq_list):
 #     filter_freq=850
 #     noise_std=1.5
 def raw_to_true_signal(result_pred, sequence, 
-    repeat_alpha=0.1, repeat_more=1, filter_freq=850, noise_std=1.5, perfect=0, p_len=1):
+    repeat_alpha=0.1, repeat_more=1, filter_freq=850, noise_std=1.5, perfect=0, 
+    p_len=1, seed=0):
     result_pred = np.array(result_pred)
     result_pred = result_pred.flatten()
     final_result = result_pred[:len(sequence)]   #-> this is Z-score
@@ -62,14 +63,16 @@ def raw_to_true_signal(result_pred, sequence,
         final_result, final_ali = repeat_k_time(p_len, final_result)
     else:
         #-> 1. repeat N times
-        final_result, final_ali, _ = repeat_n_time(repeat_alpha, final_result, repeat_more)
+        final_result, final_ali, _ = repeat_n_time(repeat_alpha, final_result,
+        	repeat_more, seed=seed)
         #-> 2. low pass filter
         if filter_freq>0:
             h,h_start,N = low_pass_filter(4000.0, filter_freq, 40.0)
             final_result = np.convolve(final_result,h)[h_start+1:-(N-h_start-1)+1]
         #-> 3. add gauss noise
         if noise_std>0:
-            final_result = final_result + add_noise(noise_std, len(final_result))
+            final_result = final_result + add_noise(noise_std,
+            	len(final_result), seed=seed)
     #--- make integer -------#
     final_result = np.array(final_result)
     final_result = np.array(map(int, 5.7*final_result+14))
@@ -105,6 +108,8 @@ if __name__ == '__main__':
 		type=float, help='set the std of the signal. \
 		The higher the value, the blurred the signal. (default is 1.5)',
 		default=1.5)
+	parser.add_argument('-S', action='store', dest='seed', type=int, default=0,
+		help='the random seed, for reproducibility')
 	parser.add_argument('-f', action='store', dest='freq',
 		type=float, help='change the cut frequency in the low pass filter. \
 		The higher the value, the smoother the signal. (default is 850)',
@@ -135,7 +140,8 @@ if __name__ == '__main__':
 	for i in range(len(result_list)):
 		final_signal, final_ali = raw_to_true_signal(result_list[i],seq_list[i], 
 			repeat_alpha=arg.alpha, repeat_more=arg.more,
-			filter_freq=arg.freq, noise_std=arg.std, perfect=arg.perfect, p_len=arg.perflen)
+			filter_freq=arg.freq, noise_std=arg.std, perfect=arg.perfect,
+			p_len=arg.perflen,seed=arg.seed)
 		write_output(final_signal, arg.output+'_{}.txt'.format(id_list[i]))
 		if not arg.perfect:
 			write_alignment(final_ali, arg.alignment+'_{}.ali'.format(id_list[i]))

@@ -275,6 +275,7 @@ then
 		-l $FILENAME/align/$PREALI \
 		-t $THREAD_NUM  \
 		-f $FILTER_FREQ -s $NOISE_STD \
+		-S $RANDOM_SEED \
 		-u $TUNE_SAMPLING \
 		$perf_mode
 	source deactivate
@@ -288,6 +289,7 @@ else
 		-l $FILENAME/align/$PREALI \
 		-t $THREAD_NUM -m $home/pore_model/model/$model_file \
 		-e $EVENT_STD -f $FILTER_FREQ -s $NOISE_STD \
+		-S $RANDOM_SEED \
 		-u $TUNE_SAMPLING \
 		$perf_mode
 	source deactivate

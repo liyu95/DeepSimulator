@@ -54,7 +54,7 @@ def sequence_official_poremodel(sequence, kmer_poremodel):
 #     noise_std=1.5
 def sequence_to_true_signal(input_part, kmer_poremodel='null', perfect=0, p_len=1,
     repeat_alpha=0.1, repeat_more=1, event_std=1.0, filter_freq=850, noise_std=1.5, 
-    sigroot='signal',aliroot='align' ):
+    sigroot='signal',aliroot='align', seed=0):
     #--- unzip input args ---#
     sequence = input_part[0]
     seq_name = input_part[1]
@@ -65,7 +65,9 @@ def sequence_to_true_signal(input_part, kmer_poremodel='null', perfect=0, p_len=
         final_result, final_ali = repeat_k_time(p_len, mean_result)
     else:
         #-> 1. repeat N times 
-        indep_result, final_ali, event_idx = repeat_n_time(repeat_alpha, mean_result, repeat_more)
+        indep_result, final_ali, event_idx = repeat_n_time(repeat_alpha, mean_result, 
+            repeat_more, seed)
+        np.random.seed(seed)
         event_std = np.random.uniform(-1*event_std*std_result[event_idx], event_std*std_result[event_idx])
         final_result = mean_result[event_idx] + event_std
         #-> 2. low pass filter
@@ -74,7 +76,7 @@ def sequence_to_true_signal(input_part, kmer_poremodel='null', perfect=0, p_len=
             final_result = np.convolve(final_result,h)[h_start+1:-(N-h_start-1)+1]
         #-> 3. add gauss noise
         if noise_std>0:
-            final_result = final_result + add_noise(noise_std, len(final_result))
+            final_result = final_result + add_noise(noise_std, len(final_result), seed=seed)
     #--- make integer -------#
     final_result = np.array(final_result)
     final_result = np.array(map(int, 5.7*final_result+14))
@@ -121,6 +123,8 @@ if __name__ == '__main__':
         type=float, help='set the std of the noise. \
         The higher the value, the blurred the signal. (default is 1.5)',
         default=1.5)
+    parser.add_argument('-S', action='store', dest='seed', type=int, default=0,
+        help='the random seed, for reproducibility')
     parser.add_argument('--perfect', action='store', dest='perfect',
         type=bool, help='Do you want a perfect signal and sequence',
         default=False)
@@ -142,7 +146,8 @@ if __name__ == '__main__':
     func=partial(sequence_to_true_signal, \
         kmer_poremodel=kmer_poremodel, perfect=arg.perfect, p_len=arg.perflen, \
         event_std=arg.event_std, filter_freq=arg.filter_freq, noise_std=arg.noise_std, \
-        repeat_alpha=arg.alpha, repeat_more=arg.more, sigroot=arg.output, aliroot=arg.alignment)
+        repeat_alpha=arg.alpha, repeat_more=arg.more, sigroot=arg.output, 
+        aliroot=arg.alignment, seed=arg.seed)
 
     #---------- multi process ------------#
     p = Pool(arg.threads)
