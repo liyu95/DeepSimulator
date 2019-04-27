@@ -13,6 +13,8 @@ parser.add_argument('-i', action='store', dest='fast5_fn', required=True,
     help='the template fasta5 file')
 parser.add_argument('-s', action='store', dest='signal_for_mod', required=True,
     help='the input signal')
+parser.add_argument('-t', action='store', dest='threads',
+    type=int, help='the number of threads used. (default is 1)', default=1)
 parser.add_argument('-d', action='store', dest='dest', default='./',
     help='the store directory')
 
@@ -67,7 +69,7 @@ if __name__ == '__main__':
     file_list = os.listdir(signal_dir_for_mod)
     file_list = map(lambda x: os.path.join(signal_dir_for_mod, x),
         file_list)
-    p = Pool()
+    p = Pool(result.threads)
     p.map(create_fast5, file_list)
 
 
