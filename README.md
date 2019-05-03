@@ -44,7 +44,7 @@ cd ./DeepSimulator/
 
 ## Install all required modules
 ```
-./install
+./install.sh
 ```
 
 # Examples
