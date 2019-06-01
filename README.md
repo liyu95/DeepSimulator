@@ -1,9 +1,9 @@
 # DeepSimulator
 The first deep learning based Nanopore simulator which can simulate the process of Nanopore sequencing.
 
-Paper: https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/bty223/4962495
+Paper: [DeepSimulator: a deep simulator for Nanopore sequencing](https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/bty223/4962495)
 
-Reference:
+If you find this tool useful, please cite our work using the following reference:
 ```
 @article{deepsimulator,
     author = {Li, Yu and Han, Renmin and Bi, Chongwei and Li, Mo and Wang, Sheng and Gao, Xin},
