@@ -360,8 +360,8 @@ echo "Basecalling finished!"
 #--------- calculate accuracy ----------#
 # check result
 echo "Checking the read accuracy..."
-cat $FILENAME/fastq/workspace/pass/*.fastq > $FILENAME/test_pass.fastq
-cat $FILENAME/fastq/workspace/fail/*.fastq > $FILENAME/test_fail.fastq
+cat $FILENAME/fastq/workspace/pass/*.fastq > $FILENAME/test_pass.fastq 2>$FILENAME/err
+cat $FILENAME/fastq/workspace/fail/*.fastq > $FILENAME/test_fail.fastq 2>$FILENAME/err
 pass_num=`grep "^@" $FILENAME/test_pass.fastq | wc | awk '{print $1}'`
 fail_num=`grep "^@" $FILENAME/test_fail.fastq | wc | awk '{print $1}'`
 cat $FILENAME/test_pass.fastq $FILENAME/test_fail.fastq > $FILENAME/test.fastq
