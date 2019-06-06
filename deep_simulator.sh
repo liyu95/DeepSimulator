@@ -360,11 +360,11 @@ echo "Basecalling finished!"
 #--------- calculate accuracy ----------#
 # check result
 echo "Checking the read accuracy..."
-cat $FILENAME/fastq/workspace/pass/*.fastq > $FILENAME/test_pass.fastq 2>$FILENAME/err
-cat $FILENAME/fastq/workspace/fail/*.fastq > $FILENAME/test_fail.fastq 2>$FILENAME/err
-pass_num=`grep "^@" $FILENAME/test_pass.fastq | wc | awk '{print $1}'`
-fail_num=`grep "^@" $FILENAME/test_fail.fastq | wc | awk '{print $1}'`
-cat $FILENAME/test_pass.fastq $FILENAME/test_fail.fastq > $FILENAME/test.fastq
+cat $FILENAME/fastq/workspace/pass/*.fastq > $FILENAME/pass.fastq 2>$FILENAME/err
+cat $FILENAME/fastq/workspace/fail/*.fastq > $FILENAME/fail.fastq 2>$FILENAME/err
+pass_num=`grep "^@" $FILENAME/pass.fastq | wc | awk '{print $1}'`
+fail_num=`grep "^@" $FILENAME/fail.fastq | wc | awk '{print $1}'`
+cat $FILENAME/pass.fastq $FILENAME/fail.fastq > $FILENAME/test.fastq
 $home/util/minimap2 -Hk19 -t $THREAD_NUM -c $FULLFILE \
 	$FILENAME/test.fastq 1> $FILENAME/mapping.paf 2> $FILENAME/err
 rm -f $FILENAME/err
