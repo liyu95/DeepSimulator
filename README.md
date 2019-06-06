@@ -98,7 +98,7 @@ One can control the behavior of DeepSimulator, including the length distribution
 ## Simple example
 Our simulator supports training a pore model using a customized dataset. An simple example, which only used the CPU resource, would be like this:
 ```
-./train_pore_model.sh -i customerized_data/
+./train_pore_model.sh -i example/customerized_data/
 ```
 Within the data folder, there are two kinds of data should be provided. The first kind of data is the sequence, and the second kind of data is the corresponding nanopore raw signal. Users can find an example of each file in the 'customized_data' folder.
 After training, an model (three files, named "model_customized.ckpt\*") would be generated in the folder 'pore_model/model'. The user can rename the build-in model (named "model_reg_seqs_gn179.ckpt\*"") to a backup name and the customized model as "model_reg_seqs_gn179.ckpt\*" (all the three files need to be changed accordingly) so that the user do not have to change the code of simulator to use the customized model.
