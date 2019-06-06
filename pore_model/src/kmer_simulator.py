@@ -54,7 +54,7 @@ def sequence_official_poremodel(sequence, kmer_poremodel):
 #     noise_std=1.5
 def sequence_to_true_signal(input_part, kmer_poremodel='null', perfect=0, p_len=1,
     repeat_alpha=0.1, repeat_more=1, event_std=1.0, filter_freq=850, noise_std=1.5, 
-    sigroot='signal',aliroot='align', seed=0):
+    sigroot='signal',aliroot='align', seed=0, aliout=False):
     #--- unzip input args ---#
     sequence = input_part[0]
     seq_name = input_part[1]
@@ -83,7 +83,8 @@ def sequence_to_true_signal(input_part, kmer_poremodel='null', perfect=0, p_len=
     #--- write to file ------#
     write_output(final_result, sigroot+'_{}.txt'.format(seq_name))
     if not arg.perfect:
-        write_alignment(final_ali, aliroot+'_{}.ali'.format(seq_name))
+        if aliout:
+            write_alignment(final_ali, aliroot+'_{}.ali'.format(seq_name))
 
 
 #=================== main =======================#
@@ -131,6 +132,9 @@ if __name__ == '__main__':
     parser.add_argument('--perflen', action='store', dest='perflen',
         type=int, help='repeat length for perfect mode',
         default=1)
+    parser.add_argument('--outali', action='store', dest='outali',
+        type=bool, help='Do you want to output the ground-truth alignment',
+        default=False)
 
 
     #---------- input list ---------------#
@@ -147,7 +151,7 @@ if __name__ == '__main__':
         kmer_poremodel=kmer_poremodel, perfect=arg.perfect, p_len=arg.perflen, \
         event_std=arg.event_std, filter_freq=arg.filter_freq, noise_std=arg.noise_std, \
         repeat_alpha=arg.alpha, repeat_more=arg.more, sigroot=arg.output, 
-        aliroot=arg.alignment, seed=arg.seed)
+        aliroot=arg.alignment, seed=arg.seed, aliout=arg.outali)
 
     #---------- multi process ------------#
     p = Pool(arg.threads)

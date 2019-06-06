@@ -120,6 +120,10 @@ if __name__ == '__main__':
 	parser.add_argument('--perflen', action='store', dest='perflen',
 		type=int, help='repeat length for perfect mode',
 		default=1)
+	parser.add_argument('--outali', action='store', dest='outali',
+		type=bool, help='Do you want to output the ground-truth alignment',
+		default=False)
+
 
 	#---------- input list ---------------#
 	arg = parser.parse_args()
@@ -144,5 +148,6 @@ if __name__ == '__main__':
 			p_len=arg.perflen,seed=arg.seed)
 		write_output(final_signal, arg.output+'_{}.txt'.format(id_list[i]))
 		if not arg.perfect:
-			write_alignment(final_ali, arg.alignment+'_{}.ali'.format(id_list[i]))
+			if arg.outali: 
+				write_alignment(final_ali, arg.alignment+'_{}.ali'.format(id_list[i]))
 
