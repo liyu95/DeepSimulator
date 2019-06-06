@@ -329,14 +329,19 @@ echo "Basecalling finished!"
 
 # check result
 echo "Checking the read accuracy..."
-cat $FILENAME/fastq/workspace/pass/*.fastq > $FILENAME/test.fastq
+cat $FILENAME/fastq/workspace/pass/*.fastq > $FILENAME/test_pass.fastq
+cat $FILENAME/fastq/workspace/fail/*.fastq > $FILENAME/test_fail.fastq
+pass_num=`grep "^@" $FILENAME/test_pass.fastq | wc | awk '{print $1}'`
+fail_num=`grep "^@" $FILENAME/test_fail.fastq | wc | awk '{print $1}'`
+cat $FILENAME/test_pass.fastq $FILENAME/test_fail.fastq > $FILENAME/test.fastq
+rm -f $FILENAME/test_pass.fastq $FILENAME/test_fail.fastq
 $home/util/minimap2 -Hk19 -t $THREAD_NUM -c $FULLFILE \
 	$FILENAME/test.fastq 1> $FILENAME/mapping.paf 2> $FILENAME/err
 rm -f $FILENAME/err
 accuracy=`awk 'BEGIN{a=0;b=0}{a+=$10/$11;b++}END{print a/b}' $FILENAME/mapping.paf`
-passnum=`grep "^@" $FILENAME/test.fastq | wc | awk '{print $1}'`
-echo "Here is the mapping identity: $accuracy of $passnum reads passed base-calling."
-echo "$accuracy $passnum" > $FILENAME/accuracy
+totalnum=`grep "^@" $FILENAME/test.fastq | wc | awk '{print $1}'`
+echo "Here is the mapping identity: $accuracy of $totalnum (pass $pass_num + fail $fail_num) reads passed base-calling."
+echo "$accuracy $totalnum $pass_num $fail_num" > $FILENAME/accuracy
 
 #---------- exit -----------#
 exit 0
