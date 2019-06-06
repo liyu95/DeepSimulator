@@ -38,7 +38,7 @@ bash Anaconda2-2018.12-Linux-x86_64.sh
 
 ## Download the DeepSimulator package
 ```
-git clone https://github.com/realbigws/DeepSimulator.git
+git clone https://github.com/lykaust15/DeepSimulator.git
 cd ./DeepSimulator/
 ```
 
@@ -80,10 +80,10 @@ then, within the folder 'artificial_human_chr22', there are six files: 'processe
 
 ## Simulated signal
 
-![alt text](https://github.com/realbigws/DeepSimulator/blob/master/example/simulated_signal.png)
+![alt text](https://github.com/lykaust15/DeepSimulator/blob/master/example/simulated_signal.png)
 
 ## Original signal
-![alt text](https://github.com/realbigws/DeepSimulator/blob/master/example/original_signal.png)
+![alt text](https://github.com/lykaust15/DeepSimulator/blob/master/example/original_signal.png)
 
 
 ## Control the behavior of DeepSimulator
