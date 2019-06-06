@@ -258,7 +258,7 @@ then
 		$circular
 	source deactivate
 else
-	mv $FILENAME/processed_genome $FILENAME/sampled_read.fasta
+	cp $FILENAME/processed_genome $FILENAME/sampled_read.fasta
 fi
 echo "Finished the preprocessing step!"
 
