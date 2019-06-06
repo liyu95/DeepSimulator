@@ -3,50 +3,63 @@
 # ----- usage ------ #
 function usage()
 {
-	echo "DeepSimulator v0.21 [Mar-14-2019] "
+	echo "DeepSimulator v0.98 [Jun-06-2019] "
 	echo "    A Deep Learning based Nanopore simulator which can simulate the process of Nanopore sequencing. "
 	echo ""
-	echo "USAGE:  ./deep_simulator.sh <-i input_genome> [-n simu_read_num] [-o out_root] [-c CPU_num] [-m sample_mode] [-M simulator] "
-	echo "                [-C cirular_genome] [-u tune_sampling] [-e event_std] [-f filter_freq] [-s noise_std] [-P perfect] [-H home] "
+	echo "USAGE:  ./deep_simulator.sh <-i input_genome> [-o out_root] [-c CPU_num] [-S random_seed] "
+	echo "                [-n read_num] [-K coverage] [-C cirular_genome] [-m sample_mode] "
+	echo "                [-M simulator] [-e event_std] [-u tune_sampling] [-O out_align] "
+	echo "                [-f filter_freq] [-s signal_std] [-P perfect] [-H home] "
 	echo "Options:"
 	echo ""
 	echo "***** required arguments *****"
 	echo "-i input_genome   : input genome in FASTA format. "
 	echo ""
-	echo "***** optional arguments *****"
-	echo "-n simu_read_num  : the number of reads need to be simulated. [default = 100] "
-	echo "                    Set -1 to simulate the whole input sequence without cut (not suitable for genome-level). "
-	echo ""
-	echo "-K coverage       : this parameter is converted to number of read in the program, if both K and n are given, we use the larger one."
-	echo ""
+	echo "***** optional arguments (main) *****"
 	echo "-o out_root       : Default output would the current directory. [default = './\${input_name}_DeepSimu'] "
 	echo ""
 	echo "-c CPU_num        : Number of processors. [default = 8]"
 	echo ""
-	echo "-S Random_seed    : Random seed for controling the read sampling process. [default = 0]"
+	echo "-S random_seed    : Random seed for controling the simulation process. [default = 0]"
+	echo "                    0 for a random seed. Use other number for a fixed seed for reproducibility. "
+	echo ""
+	echo "***** optional arguments (read-level) *****"
+	echo "-n read_num       : the number of reads need to be simulated. [default = 100] "
+	echo "                    Set -1 to simulate the whole input sequence without cut (not suitable for genome-level). "
+	echo ""
+	echo "-K coverage       : this parameter is converted to number of read in the program. [default = 0] "
+	echo "                    if both K and n are given, we use the larger one."
+	echo ""
+	echo "-C cirular_genome : 0 for linear genome and 1 for circular genome. [default = 0] "
 	echo ""
 	echo "-m sample_mode    : choose from the following distribution for the read length. [default = 3] "
 	echo "                    1: beta_distribution, 2: alpha_distribution, 3: mixed_gamma_dis. "
 	echo ""
-	echo "-M simulator      : choose either context-dependent(0) or context-independent(1) simulator. [default = 1] "
-	echo ""
-	echo "-C cirular_genome : 0 for linear genome and 1 for circular genome. [default = 0] "
-	echo ""
-	echo "-u tune_sampling  : 1 for tuning sampling rate to around eight and 0 for not. [default = 1] "
+	echo "***** optional arguments (event-signal) *****"
+	echo "-M simulator      : choose context-dependent(0) or context-independent(1) simulator to generate event. [default = 1] "
 	echo ""
 	echo "-e event_std      : set the standard deviation (std) of the random noise of the event. [default = 1.0] "
 	echo ""
-	echo "-f filter_freq    : set the frequency for the low-pass filter. [default = 850] "
+	echo "-u tune_sampling  : tuning sampling rate to around eight for each event. [default = 1 to tune] "
+	echo "                    Here eight is determined by 4000/450, where 4KHz is the signal sampling frequency, "
+	echo "                    and 450 is the bases per second to pass the nanopore. "
 	echo ""
-	echo "-s noise_std      : set the standard deviation (std) of the random noise of the signal. [default = 1.5] "
+	echo "-O out_align      : Output ground-truth warping path between simulated signal and event. [default = 0 NOT to output] "
+	echo ""
+	echo "***** optional arguments (signal-signal) *****"
+	echo "-f filter_freq    : set the frequency for the low-pass filter. [default = 850] "
+	echo "                    a higher frequency value would result in better base-calling accuracy "
+	echo ""
+	echo "-s signal_std     : set the standard deviation (std) of the random noise of the signal. [default = 1.5] "
 	echo "                    '1.0' would give the base-calling accuracy around 92\%, "
 	echo "                    '1.5' would give the base-calling accuracy around 90\%, "
 	echo "                    '2.0' would give the base-calling accuracy around 85\%, "
 	echo ""
 	echo "-P perfect        : 0 for normal mode (with length repeat and random noise). [default = 0]"
-	echo "                    1 for perfect context-dependent pore model (without length repeat and random noise). "
+	echo "                    1 for perfect pore model (without 'event length repeat' and 'signal random noise'). "
 	echo "                    2 for generating almost perfect reads without any randomness in signals (equal to -e 0 -f 0 -s 0). "
 	echo ""
+	echo "***** home directory *****"
 	echo "-H home           : home directory of DeepSimulator. [default = 'current directory'] "
 	echo ""
 	exit 1
@@ -74,32 +87,32 @@ fi
 #------- required arguments ------------#
 FULLFILE=""
 out_root=""
-
 #------- optioanl parameters -----------#
+THREAD_NUM=8        #-> this is the thread (or, CPU) number
+RANDOM_SEED=0       #-> random seed for controling sampling, for reproducibility. default: [0]
+#------- read-level parameter ----------#
 SAMPLE_NUM=100      #-> by default, we simulate 100 reads
 COVERAGE=0          #-> the coverage parameter, we simulate read whichever the larger, SAMPLE_NUM or the number computed from coverage
-#-> multiprocess
-THREAD_NUM=8        #-> this is the thread (or, CPU) number
-#-> simulator mode
-SAMPLE_MODE=3       #-> choose from the following distribution: 1: beta_distribution, 2: alpha_distribution, 3: mixed_gamma_dis. default: [3]
-SIMULATOR_MODE=1    #-> choose from the following type of simulator: 0: context-dependent, 1: context-independent. default: [1]
 GENOME_CIRCULAR=0   #-> 0 for NOT circular and 1 for circular. default: [0]
-TUNE_SAMPLING=1     #-> 1 for tuning sampling rate to around 8. default: [1]
-#-> read geneartion
-RANDOM_SEED=0       #-> random seed for controling sampling, for reproducibility. default: [0]
+SAMPLE_MODE=3       #-> choose from the following distribution: 1: beta_distribution, 2: alpha_distribution, 3: mixed_gamma_dis. default: [3]
+#------- event-level parameter ---------#
+SIMULATOR_MODE=1    #-> choose from the following type of simulator: 0: context-dependent, 1: context-independent. default: [1]
 EVENT_STD=1.0       #-> set the std of random noise of the event, default = 1.0
+TUNE_SAMPLING=1     #-> 1 for tuning sampling rate to around 8. default: [1]
+ALIGN_OUT=0         #-> 1 for the output of ground-truth warping path between simulated signal and event. default: [0]
+#------- signal-level parameter --------#
 FILTER_FREQ=850     #-> set the frequency for the low-pass filter. default = 850
 NOISE_STD=1.5       #-> set the std of random noise of the signal, default = 1.5
 #-> perfect mode
 PERFECT_MODE=0      #-> 0 for normal mode (with length repeat and random noise). [default = 0]
                     #-> 1 for perfect context-dependent pore model (without length repeat and random noise).
                     #-> 2 for generating almost perfect reads without any randomness in signals (equal to -e 0 -f 0 -s 0).
-#------- home directory -----------------#
+#------- home directory ----------------#
 home=$curdir
 
 
 #------- parse arguments ---------------#
-while getopts ":i:n:K:o:c:S:m:M:C:u:e:f:s:P:H:" opt;
+while getopts ":i:o:c:S:n:K:C:m:M:e:u:O:f:s:P:H:" opt;
 do
 	case $opt in
 	#-> required arguments
@@ -110,35 +123,39 @@ do
 	o)
 		out_root=$OPTARG
 		;;
-	n)
-		SAMPLE_NUM=$OPTARG
-		;;
-	K)
-		COVERAGE=$OPTARG
-		;;
 	c)
 		THREAD_NUM=$OPTARG
 		;;
 	S)
 		RANDOM_SEED=$OPTARG
 		;;
-	#-> simulator mode
-	m)
-		SAMPLE_MODE=$OPTARG
+	#-> read-level arguments
+	n)
+		SAMPLE_NUM=$OPTARG
 		;;
-	M)
-		SIMULATOR_MODE=$OPTARG
+	K)
+		COVERAGE=$OPTARG
 		;;
 	C)
 		GENOME_CIRCULAR=$OPTARG
 		;;
-	u)
-		TUNE_SAMPLING=$OPTARG
+	m)
+		SAMPLE_MODE=$OPTARG
 		;;
-	#-> simulator parameters
+	#-> event-level arguments
+	M)
+		SIMULATOR_MODE=$OPTARG
+		;;
 	e)
 		EVENT_STD=$OPTARG
 		;;
+	u)
+		TUNE_SAMPLING=$OPTARG
+		;;
+	O)
+		ALIGN_OUT=$OPTARG
+		;;
+	#-> signal-level parameters
 	f)
 		FILTER_FREQ=$OPTARG
 		;;
@@ -179,7 +196,7 @@ fi
 home=`readlink -f $home`
 
 #----------- check input genome  -----------#
-if [ -z "$FULLFILE" ]
+if [ ! -s "$FULLFILE" ]
 then
 	echo "input input_genome is null !!" >&2
 	exit 1
@@ -252,9 +269,18 @@ echo "Finished the preprocessing step!"
 rm -rf $FILENAME/signal/*
 mkdir -p $FILENAME/signal
 rm -rf $FILENAME/align/*
-mkdir -p $FILENAME/align
+if [ $ALIGN_OUT -eq 1 ]
+then
+	mkdir -p $FILENAME/align
+fi
 
 #--------- determine running mode -----------#
+#-> output alignment
+align_out=""
+if [ $ALIGN_OUT -eq 1 ]
+then
+	align_out="--outali True"
+fi
 #-> perfect mode
 perf_mode=""
 if [ $PERFECT_MODE -eq 1 ]
@@ -284,7 +310,7 @@ then
 		-f $FILTER_FREQ -s $NOISE_STD \
 		-S $RANDOM_SEED \
 		-u $TUNE_SAMPLING \
-		$perf_mode
+		$perf_mode $align_out
 	source deactivate
 else
 	echo "Running the context-independent pore model..."
@@ -298,11 +324,12 @@ else
 		-e $EVENT_STD -f $FILTER_FREQ -s $NOISE_STD \
 		-S $RANDOM_SEED \
 		-u $TUNE_SAMPLING \
-		$perf_mode
+		$perf_mode $align_out
 	source deactivate
 fi
 echo "Finished generate the simulated signals!"
 
+#--------- generate FAST5 --------------#
 # change the signal file to fasta5 file
 echo "Converting the signal into FAST5 files..."
 rm -rf $FILENAME/fast5/*
@@ -313,8 +340,11 @@ python2 $home/util/fast5_modify_signal.py \
 	-s $FILENAME/signal -t $THREAD_NUM \
 	-d $FILENAME/fast5 
 source deactivate
+rm -rf $FILENAME/signal/*
+rmdir $FILENAME/signal
 echo "Finished format converting!"
 
+#--------- base-calling ----------------#
 # basecalling using albacore
 echo "Running Albacore..."
 FAST5_DIR="$FILENAME/fast5"
@@ -327,6 +357,7 @@ read_fast5_basecaller.py -i $FAST5_DIR -s $FASTQ_DIR \
 source deactivate
 echo "Basecalling finished!"
 
+#--------- calculate accuracy ----------#
 # check result
 echo "Checking the read accuracy..."
 cat $FILENAME/fastq/workspace/pass/*.fastq > $FILENAME/test_pass.fastq
@@ -334,7 +365,6 @@ cat $FILENAME/fastq/workspace/fail/*.fastq > $FILENAME/test_fail.fastq
 pass_num=`grep "^@" $FILENAME/test_pass.fastq | wc | awk '{print $1}'`
 fail_num=`grep "^@" $FILENAME/test_fail.fastq | wc | awk '{print $1}'`
 cat $FILENAME/test_pass.fastq $FILENAME/test_fail.fastq > $FILENAME/test.fastq
-rm -f $FILENAME/test_pass.fastq $FILENAME/test_fail.fastq
 $home/util/minimap2 -Hk19 -t $THREAD_NUM -c $FULLFILE \
 	$FILENAME/test.fastq 1> $FILENAME/mapping.paf 2> $FILENAME/err
 rm -f $FILENAME/err
@@ -342,9 +372,10 @@ accuracy=`awk 'BEGIN{a=0;b=0}{a+=$10/$11;b++}END{print a/b}' $FILENAME/mapping.p
 totalnum=`grep "^@" $FILENAME/test.fastq | wc | awk '{print $1}'`
 echo "Here is the mapping identity: $accuracy of $totalnum (pass $pass_num + fail $fail_num) reads passed base-calling."
 echo "$accuracy $totalnum $pass_num $fail_num" > $FILENAME/accuracy
+# remove temporary files
+rm -rf $FILENAME/fastq
+rm -f $FILENAME/test.fastq
 
 #---------- exit -----------#
 exit 0
-
-
 
