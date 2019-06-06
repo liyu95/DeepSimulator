@@ -76,16 +76,43 @@ Within the output folder, there are several folders and files. If you run
 ```
 then, within the folder 'artificial_human_chr22', there are six files: 'processed_genome', 'sampled_read.fasta', 'pass.fastq', 'fail.fastq', 'mapping.paf', and 'accuracy'. There is one folder: 'fast5'. Let us explain all of them in chronological order. After receiving the original input genome file, we first perform some essential preprocessing, resulting in the file 'processed_genome'. After that, we run the first module, sampling reads from the processed genome, resulting in 'sampled_read.fasta'. Then, the 'sampled_read.fasta' will go through the pore model, resulting in 'fast5' folder, where we store the simulated signals in FAST5 file. If option '-O 1' is specified, then we create the 'align' folder to store the repeat times for each position in each read. Afterward, the 'fast5' folder can be the input of the base-caller, e.g., Albacore. We collect the results from the base-caller into the two file 'pass.fastq' and 'fail.fastq' to record the passed and failed reads. Finally, we check the accuracy using minimap2, whose output is 'mapping.paf'. File 'accuracy' stores the accuracy for later reference.
 
+
 # Simulated VS original signal
 
 ## Simulated signal
+<p align="center">
+<img src="https://github.com/lykaust15/DeepSimulator/blob/master/example/simulated_signal.png" width="600"/>
+</p>
 
-![alt text](https://github.com/lykaust15/DeepSimulator/blob/master/example/simulated_signal.png)
 
 ## Original signal
-![alt text](https://github.com/lykaust15/DeepSimulator/blob/master/example/original_signal.png)
+<p align="center">
+<img src="https://github.com/lykaust15/DeepSimulator/blob/master/example/original_signal.png" width="600"/>
+</p>
 
 
 ## Control the behavior of DeepSimulator
 One can control the behavior of DeepSimulator, including the length distribution of the reads or the accuracy, *etc.*, by using different options in ```deep_simulator.sh```. Detailed descriptions of the parameters in ```deep_simulator.sh``` file can be refered to Section S4 in [Supplementary material of DeepSimulator](https://oup.silverchair-cdn.com/oup/backfile/Content_public/Journal/bioinformatics/34/17/10.1093_bioinformatics_bty223/2/bty223_supplemental_materials.pdf?Expires=2147483647&Signature=v5FSUbbU4eVfQdIo3H3Xrsq6CFVh8azonSxGg1WaAL35maQ0zqIPzdRPTTGUUhlzkLYBnU3Fi4G1DRcXc5YDD4Ea~8ic56zpjBNWQ4qqSZabjH9XwTFyPTbh6IKaHkULi9zKfSl02MxxXfqEJ0Xi72AKRv0Up4j~baWrfyUEKYtEVkzJbpbyAsnZhvPh2WSbFXyPhRhBn~fH9XfrEO9hbMQPSrT9di2Ho85ZBbZ2xS0P~J8sZyi91ulXQHfYSH5rbdaTNAAxRCVbLQUi3iKbJFE5Bl0de66w0mdjfgIZGqrBY9uPoXwW4MYf6H7OwmVXnDc-sjoe73UxO4xHRF17Ag__&Key-Pair-Id=APKAIE5G5CRDK6RD3PGA)
 
+# Train customized model
+
+## Simple example
+Our simulator supports training a pore model using a customized dataset. An simple example, which only used the CPU resource, would be like this:
+```
+./train_pore_model.sh -i example/customerized_data/
+```
+Within the data folder, there are two kinds of data should be provided. The first kind of data is the sequence, and the second kind of data is the corresponding nanopore raw signal. Users can find an example of each file in the 'customized_data' folder.
+After training, an model (three files, named "model_customized.ckpt\*") would be generated in the folder 'pore_model/model'. The user can rename the build-in model (named "model_reg_seqs_gn179.ckpt\*"") to a backup name and the customized model as "model_reg_seqs_gn179.ckpt\*" (all the three files need to be changed accordingly) so that the user do not have to change the code of simulator to use the customized model.
+
+**Notice**: Generally, we do not recommend user to train a customized pore model because the data preparation and model training are quite time consuming and there might be some unexpected errors because  of the update of Tensorflow and the dependencies, such as CUDA and cuDNN, which notoriously annoying. We would make the model updated to the Nanopore technology development.
+
+## Advanced
+The above example only uses CPU, which would take years to train a model. To accelerate the training process and take advantage the computational power of GPU, users can consider using the GPU version of Tensorflow. User should make sure the following dependencies are installed correctly before running the training code on a workstation with GPU card.
+
+1. CUDA (http://docs.nvidia.com/cuda/cuda-installation-guide-linux/#axzz4VZnqTJ2A)
+2. cuDNN (https://developer.nvidia.com/cudnn)
+3. Tensorflow-gpu (https://www.tensorflow.org/install/install_linux)
+
+Users can refer to the Tensorflow website (https://www.tensorflow.org/) for more detailed instruction of setting up the environment.
+
+*This tool is for academic purposes and research use only. Any commercial use is subject for authorization from King Abdullah University of Science and technology “KAUST”. Please contact us at ip@kaust.edu.sa.*
