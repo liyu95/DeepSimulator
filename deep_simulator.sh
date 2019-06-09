@@ -8,7 +8,7 @@ function usage()
 	echo ""
 	echo "USAGE:  ./deep_simulator.sh <-i input_genome> [-o out_root] [-c CPU_num] [-S random_seed] "
 	echo "                [-n read_num] [-K coverage] [-l read_len_mean] [-C cirular_genome] [-m sample_mode] "
-	echo "                [-M simulator] [-e event_std] [-u tune_sampling] [-O out_align] "
+	echo "                [-M simulator] [-e event_std] [-u tune_sampling] [-O out_align] [-G sig_out]"
 	echo "                [-f filter_freq] [-s signal_std] [-P perfect] [-H home] "
 	echo "Options:"
 	echo ""
