@@ -7,7 +7,7 @@ function usage()
 	echo "    A Deep Learning based Nanopore simulator which can simulate the process of Nanopore sequencing. "
 	echo ""
 	echo "USAGE:  ./deep_simulator.sh <-i input_genome> [-o out_root] [-c CPU_num] [-S random_seed] "
-	echo "                [-n read_num] [-K coverage] [-C cirular_genome] [-m sample_mode] "
+	echo "                [-n read_num] [-K coverage] [-l read_len_mean] [-C cirular_genome] [-m sample_mode] "
 	echo "                [-M simulator] [-e event_std] [-u tune_sampling] [-O out_align] "
 	echo "                [-f filter_freq] [-s signal_std] [-P perfect] [-H home] "
 	echo "Options:"
@@ -29,6 +29,8 @@ function usage()
 	echo ""
 	echo "-K coverage       : this parameter is converted to number of read in the program. [default = 0] "
 	echo "                    if both K and n are given, we use the larger one."
+	echo ""
+	echo "-l read_len_mean  : this parameter is used to control the read length mean. [default=8000] "
 	echo ""
 	echo "-C cirular_genome : 0 for linear genome and 1 for circular genome. [default = 0] "
 	echo ""
@@ -93,6 +95,7 @@ RANDOM_SEED=0       #-> random seed for controling sampling, for reproducibility
 #------- read-level parameter ----------#
 SAMPLE_NUM=100      #-> by default, we simulate 100 reads
 COVERAGE=0          #-> the coverage parameter, we simulate read whichever the larger, SAMPLE_NUM or the number computed from coverage
+LEN_MEAN=8000       #-> read length mean
 GENOME_CIRCULAR=0   #-> 0 for NOT circular and 1 for circular. default: [0]
 SAMPLE_MODE=3       #-> choose from the following distribution: 1: beta_distribution, 2: alpha_distribution, 3: mixed_gamma_dis. default: [3]
 #------- event-level parameter ---------#
@@ -112,7 +115,7 @@ home=$curdir
 
 
 #------- parse arguments ---------------#
-while getopts ":i:o:c:S:n:K:C:m:M:e:u:O:f:s:P:H:" opt;
+while getopts ":i:o:c:S:n:K:l:C:m:M:e:u:O:f:s:P:H:" opt;
 do
 	case $opt in
 	#-> required arguments
@@ -135,6 +138,9 @@ do
 		;;
 	K)
 		COVERAGE=$OPTARG
+		;;
+	l)
+		LEN_MEAN=$OPTARG
 		;;
 	C)
 		GENOME_CIRCULAR=$OPTARG
@@ -253,6 +259,7 @@ then
 		-p $FILENAME/sampled_read \
 		-n $SAMPLE_NUM \
 		-K $COVERAGE \
+		-l $LEN_MEAN \
 		-d $SAMPLE_MODE \
 		-S $RANDOM_SEED \
 		$circular
