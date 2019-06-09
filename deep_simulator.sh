@@ -303,6 +303,8 @@ fi
 model_file=template_median68pA.model
 
 #--------- run different mode of simulator -------------#
+rm -rf $FILENAME/fast5/*
+mkdir -p $FILENAME/fast5
 if [ $SIMULATOR_MODE -eq 0 ]
 then
 	echo "Running the context-dependent pore model..."
@@ -331,25 +333,27 @@ else
 		-e $EVENT_STD -f $FILTER_FREQ -s $NOISE_STD \
 		-S $RANDOM_SEED \
 		-u $TUNE_SAMPLING \
+		-F $FILENAME/fast5 \
+		-T $home/util/template.fast5 \
 		$perf_mode $align_out
 	source deactivate
 fi
-echo "Finished generate the simulated signals!"
+echo "Finished generate the simulated signals and fast5 files!"
 
 #--------- generate FAST5 --------------#
 # change the signal file to fasta5 file
-echo "Converting the signal into FAST5 files..."
-rm -rf $FILENAME/fast5/*
-mkdir -p $FILENAME/fast5
-source activate tensorflow_cdpm
-python2 $home/util/fast5_modify_signal.py \
-	-i $home/util/template.fast5 \
-	-s $FILENAME/signal -t $THREAD_NUM \
-	-d $FILENAME/fast5 
-source deactivate
-rm -rf $FILENAME/signal/*
-rmdir $FILENAME/signal
-echo "Finished format converting!"
+# echo "Converting the signal into FAST5 files..."
+# rm -rf $FILENAME/fast5/*
+# mkdir -p $FILENAME/fast5
+# source activate tensorflow_cdpm
+# python2 $home/util/fast5_modify_signal.py \
+# 	-i $home/util/template.fast5 \
+# 	-s $FILENAME/signal -t $THREAD_NUM \
+# 	-d $FILENAME/fast5 
+# source deactivate
+# rm -rf $FILENAME/signal/*
+# rmdir $FILENAME/signal
+# echo "Finished format converting!"
 
 #--------- base-calling ----------------#
 # basecalling using albacore

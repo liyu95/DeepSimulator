@@ -2,6 +2,7 @@ from data_pre import *
 from con_reg_seq import *
 from poremodel_util import *
 import numpy as np
+from functools import partial
 from multiprocessing import Pool
 import multiprocessing
 import os
@@ -44,16 +45,18 @@ def convert_to_input(seq_list):
     p.join()
     return seq_chunk_list
 
-
 #----------- main program: sequence to raw signal --------------#
 # default parameters:
 #     repeat_alpha=0.1
 #     repeat_more=1
 #     filter_freq=850
 #     noise_std=1.5
-def raw_to_true_signal(result_pred, sequence, 
+def raw_to_true_signal(input_part,
     repeat_alpha=0.1, repeat_more=1, filter_freq=850, noise_std=1.5, perfect=0, 
-    p_len=1, seed=0):
+    p_len=1, seed=0, sigroot='signal',aliroot='align', aliout=False):
+    result_pred = model_whole_set_check(input_part[0])
+    sequence = input_part[1]
+    seq_name = input_part[2]
     result_pred = np.array(result_pred)
     result_pred = result_pred.flatten()
     final_result = result_pred[:len(sequence)]   #-> this is Z-score
@@ -76,7 +79,12 @@ def raw_to_true_signal(result_pred, sequence,
     #--- make integer -------#
     final_result = np.array(final_result)
     final_result = np.array(map(int, 5.7*final_result+14))
-    return final_result, final_ali
+
+    #--- write to file ------#
+    write_output(final_result, sigroot+'_{}.txt'.format(seq_name))
+    if not perfect:
+        if aliout:
+            write_alignment(final_ali, aliroot+'_{}.ali'.format(seq_name))    
 
 
 
@@ -131,23 +139,16 @@ if __name__ == '__main__':
 	id_list = get_id_list(arg.input)
 	seq_chunk_list = convert_to_input(seq_list)
 
-	#---------- deep simulator -----------#
-	result_list = []
-	p = Pool(arg.threads)
-	result_list = list(tqdm.tqdm(
-		p.imap(model_whole_set_check, seq_chunk_list), 
-		total=len(seq_chunk_list)))
-	p.close()
-	p.join()
 
-	#---------- output results -----------#
-	for i in range(len(result_list)):
-		final_signal, final_ali = raw_to_true_signal(result_list[i],seq_list[i], 
+	#---------- deep simulator -----------#
+	in_list = zip(seq_chunk_list, seq_list, id_list)
+	func=partial(raw_to_true_signal, 
 			repeat_alpha=arg.alpha, repeat_more=arg.more,
 			filter_freq=arg.freq, noise_std=arg.std, perfect=arg.perfect,
-			p_len=arg.perflen,seed=arg.seed)
-		write_output(final_signal, arg.output+'_{}.txt'.format(id_list[i]))
-		if not arg.perfect:
-			if arg.outali: 
-				write_alignment(final_ali, arg.alignment+'_{}.ali'.format(id_list[i]))
+			p_len=arg.perflen,seed=arg.seed, sigroot=arg.output, 
+			aliroot=arg.alignment, aliout=arg.outali)
+	p = Pool(arg.threads)
+	list(tqdm.tqdm(p.imap(func, in_list),total=len(in_list)))
+	p.close()
+	p.join()
 
