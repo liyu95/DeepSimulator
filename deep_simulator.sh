@@ -48,6 +48,8 @@ function usage()
 	echo ""
 	echo "-O out_align      : Output ground-truth warping path between simulated signal and event. [default = 0 NOT to output] "
 	echo ""
+	echo "-G out_signal     : Output simulated signal in txt format. [default = 0 NOT to output] "
+	echo ""
 	echo "***** optional arguments (signal-signal) *****"
 	echo "-f filter_freq    : set the frequency for the low-pass filter. [default = 850] "
 	echo "                    a higher frequency value would result in better base-calling accuracy "
@@ -103,6 +105,7 @@ SIMULATOR_MODE=1    #-> choose from the following type of simulator: 0: context-
 EVENT_STD=1.0       #-> set the std of random noise of the event, default = 1.0
 TUNE_SAMPLING=1     #-> 1 for tuning sampling rate to around 8. default: [1]
 ALIGN_OUT=0         #-> 1 for the output of ground-truth warping path between simulated signal and event. default: [0]
+SIG_OUT=0           #-> 1 to output the signal in text format
 #------- signal-level parameter --------#
 FILTER_FREQ=850     #-> set the frequency for the low-pass filter. default = 850
 NOISE_STD=1.5       #-> set the std of random noise of the signal, default = 1.5
@@ -115,7 +118,7 @@ home=$curdir
 
 
 #------- parse arguments ---------------#
-while getopts ":i:o:c:S:n:K:l:C:m:M:e:u:O:f:s:P:H:" opt;
+while getopts ":i:o:c:S:n:K:l:C:m:M:e:u:O:G:f:s:P:H:" opt;
 do
 	case $opt in
 	#-> required arguments
@@ -160,6 +163,9 @@ do
 		;;
 	O)
 		ALIGN_OUT=$OPTARG
+		;;
+	G)
+		SIG_OUT=$OPTARG
 		;;
 	#-> signal-level parameters
 	f)
@@ -274,7 +280,10 @@ echo "Finished the preprocessing step!"
 # signal duplication 
 # done within pore model
 rm -rf $FILENAME/signal/*
-mkdir -p $FILENAME/signal
+if [ $SIG_OUT -eq 1 ]
+then
+	mkdir -p $FILENAME/signal
+fi
 rm -rf $FILENAME/align/*
 if [ $ALIGN_OUT -eq 1 ]
 then
@@ -287,6 +296,11 @@ align_out=""
 if [ $ALIGN_OUT -eq 1 ]
 then
 	align_out="--outali True"
+fi
+sig_out=""
+if [ $SIG_OUT -eq 1 ]
+then
+	sig_out="--sigout True"
 fi
 #-> perfect mode
 perf_mode=""
@@ -319,7 +333,9 @@ then
 		-f $FILTER_FREQ -s $NOISE_STD \
 		-S $RANDOM_SEED \
 		-u $TUNE_SAMPLING \
-		$perf_mode $align_out
+		-F $FILENAME/fast5 \
+		-T $home/util/template.fast5 \
+		$perf_mode $align_out $sig_out
 	source deactivate
 else
 	echo "Running the context-independent pore model..."
@@ -335,7 +351,7 @@ else
 		-u $TUNE_SAMPLING \
 		-F $FILENAME/fast5 \
 		-T $home/util/template.fast5 \
-		$perf_mode $align_out
+		$perf_mode $align_out $sig_out
 	source deactivate
 fi
 echo "Finished generate the simulated signals and fast5 files!"

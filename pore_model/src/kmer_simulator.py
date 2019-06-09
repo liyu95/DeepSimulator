@@ -173,6 +173,9 @@ if __name__ == '__main__':
     parser.add_argument('--outali', action='store', dest='outali',
         type=bool, help='Do you want to output the ground-truth alignment',
         default=False)
+    parser.add_argument('--sigout', action='store', dest='sigout',
+        type=bool, help='Do you want to output the simulated signal in text format',
+        default=False)
     parser.add_argument('-F', action='store', dest='fast5_root', required=True,
         help='The fast5 file root')
     parser.add_argument('-T', action='store', dest='fast5_template', required=True,
