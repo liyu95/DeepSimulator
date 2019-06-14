@@ -356,21 +356,6 @@ else
 fi
 echo "Finished generate the simulated signals and fast5 files!"
 
-#--------- generate FAST5 --------------#
-# change the signal file to fasta5 file
-# echo "Converting the signal into FAST5 files..."
-# rm -rf $FILENAME/fast5/*
-# mkdir -p $FILENAME/fast5
-# source activate tensorflow_cdpm
-# python2 $home/util/fast5_modify_signal.py \
-# 	-i $home/util/template.fast5 \
-# 	-s $FILENAME/signal -t $THREAD_NUM \
-# 	-d $FILENAME/fast5 
-# source deactivate
-# rm -rf $FILENAME/signal/*
-# rmdir $FILENAME/signal
-# echo "Finished format converting!"
-
 #--------- base-calling ----------------#
 # basecalling using albacore
 echo "Running Albacore..."
