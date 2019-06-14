@@ -380,13 +380,13 @@ mkdir -p $FASTQ_DIR
 if [ $BASE_CALLER -eq 1 ]
 then
 	echo "   Basecalling with Guppy_GPU..."
-	$home/$guppy/ont-guppy/bin/guppy_basecaller -r --input_path $FAST5_DIR \
+	$home/base_caller/$guppy/ont-guppy/bin/guppy_basecaller -r --input_path $FAST5_DIR \
 		--save_path $FASTQ_DIR -c dna_r9.4.1_450bps_hac.cfg \
 		-x auto
 elif [ $BASE_CALLER -eq 2 ]
 then
 	echo "   Basecalling with Guppy_CPU..."
-	$home/$guppy/ont-guppy-cpu/bin/guppy_basecaller -r --input_path $FAST5_DIR \
+	$home/base_caller/$guppy/ont-guppy-cpu/bin/guppy_basecaller -r --input_path $FAST5_DIR \
 		--save_path $FASTQ_DIR -c dna_r9.4.1_450bps_hac.cfg \
 		--cpu_threads_per_caller $THREAD_NUM --num_callers 1
 else

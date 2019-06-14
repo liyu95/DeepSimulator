@@ -16,11 +16,11 @@ source deactivate
 
 #-> 2. install basecaller
 #--| 2.1 install albacore_2.3.1
-cd albacore_2.3.1/
+cd base_caller/albacore_2.3.1/
 	./download_and_install.sh
-cd ../
+cd ../../
 
 #--| 2.2 install guppy_3.1.5
-cd guppy_3.1.5/
+cd base_caller/guppy_3.1.5/
 	./download_and_install.sh
-cd ../
+cd ../../
