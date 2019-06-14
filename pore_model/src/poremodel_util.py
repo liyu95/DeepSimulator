@@ -2,7 +2,10 @@ import numpy as np
 import scipy.stats as st
 from random import *
 import scipy.signal
-
+import uuid
+from shutil import copyfile
+import os
+import h5py
 
 
 #--------------- step 1: load input sequence ---------------#

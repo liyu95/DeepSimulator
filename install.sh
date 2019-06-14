@@ -11,15 +11,16 @@ pip install tqdm==4.19.4
 pip install scipy==0.18.1
 pip install h5py==2.7.1
 pip install numpy==1.13.1
-pip install sklearn
+pip install scikit-learn==0.20.3
 source deactivate
 
-#-> 2. install basecall
-conda remove --name basecall --all -y
-conda create --name basecall python=3.6 -y
-source activate basecall
-#wget -q https://mirror.oxfordnanoportal.com/software/analysis/ont_albacore-2.3.1-cp36-cp36m-manylinux1_x86_64.whl
-pip install albacore_2.3.1/ont_albacore-2.3.1-cp36-cp36m-manylinux1_x86_64.whl
-#rm -f ont_albacore-2.3.1-cp36-cp36m-manylinux1_x86_64.whl
-source deactivate
+#-> 2. install basecaller
+#--| 2.1 install albacore_2.3.1
+cd albacore_2.3.1/
+	./download_and_install.sh
+cd ../
 
+#--| 2.2 install guppy_3.1.5
+cd guppy_3.1.5/
+	./download_and_install.sh
+cd ../

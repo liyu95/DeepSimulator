@@ -5,12 +5,9 @@ import numpy as np
 from functools import partial
 from multiprocessing import Pool
 import multiprocessing
+import os
 import argparse
 import tqdm
-import uuid
-import os
-from shutil import copyfile
-import h5py
 
 
 #----- use GPU for TensorFlow -----#

@@ -4,10 +4,6 @@ from functools import partial
 from multiprocessing import Pool
 import multiprocessing
 import argparse
-import uuid
-import os
-from shutil import copyfile
-import h5py
 from tqdm import *
 
 
