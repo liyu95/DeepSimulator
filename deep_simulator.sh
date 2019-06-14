@@ -55,7 +55,7 @@ function usage()
 	echo ""
 	echo "***** optional arguments (signal-signal) *****"
 	echo "-f filter_freq    : Set the frequency for the low-pass filter. [default = 950] "
-	echo "                    a higher frequency value would result in better base-calling accuracy "
+	echo "                    [hint]: a higher frequency value would result in better base-calling accuracy. "
 	echo ""
 	echo "-s signal_std     : Set the standard deviation (std) of the random noise of the signal. [default = 1.0] "
 	echo "                    [hint]: tune event_std, filter_freq and signal_std to simulate different sequencing qualities. "
