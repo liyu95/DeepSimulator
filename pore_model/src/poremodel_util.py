@@ -35,6 +35,31 @@ def write_alignment(result, file_name):
             temp = str(i[0]+1)+' '+str(i[1]+1)+'\n'
             f.write(temp)
 
+def signal2fasta5(template_file, data_in, fast5_root, fast5_base):
+    uid = str(uuid.uuid4())
+    fast5_fn = os.path.join(fast5_root,
+        fast5_base+'_'+uid+'.fast5')
+    copyfile(template_file, fast5_fn)
+    ##Open file
+    try:
+        fast5_data = h5py.File(fast5_fn, 'r+')
+    except IOError:
+        raise IOError, 'Error opening file. Likely a corrupted file.'
+
+    #Get raw data
+    try:
+        raw_dat   = fast5_data['/Raw/Reads/'].values()[0]
+        raw_attrs = raw_dat.attrs
+        del raw_dat['Signal']
+        raw_dat.create_dataset('Signal',data=data_in, dtype='i2', compression='gzip', compression_opts=9)  #-> with compression
+        raw_attrs['duration'] = data_in.size
+        raw_attrs['read_id'] = uid
+    except:
+        raise RuntimeError, (
+            'Raw data is not stored in Raw/Reads/Read_[read#] so ' +
+            'new segments cannot be identified.')
+    fast5_data.close()
+
 
 #---------- step 2: repeat length sample -----------#
 def rep_rvs(size,a, more, seed=0):

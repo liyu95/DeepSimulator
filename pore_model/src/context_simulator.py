@@ -48,31 +48,6 @@ def convert_to_input(seq_list):
     p.join()
     return seq_chunk_list
 
-def signal2fasta5(template_file, data_in, fast5_root, fast5_base):
-    uid = str(uuid.uuid4())
-    fast5_fn = os.path.join(fast5_root, 
-        fast5_base+'_'+uid+'.fast5')
-    copyfile(template_file, fast5_fn)
-    ##Open file
-    try:
-        fast5_data = h5py.File(fast5_fn, 'r+')
-    except IOError:
-        raise IOError, 'Error opening file. Likely a corrupted file.'
-
-    #Get raw data
-    try:
-        raw_dat   = fast5_data['/Raw/Reads/'].values()[0]
-        raw_attrs = raw_dat.attrs
-        del raw_dat['Signal']
-        raw_dat.create_dataset('Signal',data=data_in, dtype='i2', compression='gzip', compression_opts=9)  #-> with compression
-        raw_attrs['duration'] = data_in.size
-        raw_attrs['read_id'] = uid
-    except:
-        raise RuntimeError, (
-            'Raw data is not stored in Raw/Reads/Read_[read#] so ' +
-            'new segments cannot be identified.')
-    fast5_data.close()
-
 #----------- main program: sequence to raw signal --------------#
 # default parameters:
 #     repeat_alpha=0.1
@@ -103,13 +78,14 @@ def raw_to_true_signal(input_part,
             final_result = np.convolve(final_result,h)[h_start+1:-(N-h_start-1)+1]
         #-> 3. add gauss noise
         if noise_std>0:
-            final_result = final_result + add_noise(noise_std,
+            final_result = final_result + add_noise(noise_std, 
             	len(final_result), seed=seed)
     #--- make integer -------#
     final_result = np.array(final_result)
     final_result = np.array(map(int, 5.7*final_result+14))
 
     #--- write to file ------#
+    # write the fast5 file
     signal2fasta5(template_file, final_result, fast5_root, 
         sigroot.split('/')[-1]+'_{}'.format(seq_name))
     if sigout:
@@ -117,7 +93,6 @@ def raw_to_true_signal(input_part,
     if not perfect:
         if aliout:
             write_alignment(final_ali, aliroot+'_{}.ali'.format(seq_name))    
-
 
 
 
@@ -144,16 +119,17 @@ if __name__ == '__main__':
     	perfect basecalling result using Albacore', default=0.1)
     parser.add_argument('-u', action='store', dest='more',
     	type=int, help='tune sampling rate to around 8. (default is 1)', default=1)
-    parser.add_argument('-s', action='store', dest='std',
-    	type=float, help='set the std of the signal. \
+    parser.add_argument('-f', action='store', dest='freq',
+        type=float, help='change the cut frequency in the low pass filter. \
+        The higher the value, the smoother the signal. (default is 850) \
+        Set -1 to disable',
+        default=850)
+    parser.add_argument('-s', action='store', dest='noise_std',
+    	type=float, help='set the std of the noise. \
     	The higher the value, the blurred the signal. (default is 1.5)',
     	default=1.5)
     parser.add_argument('-S', action='store', dest='seed', type=int, default=0,
     	help='the random seed, for reproducibility')
-    parser.add_argument('-f', action='store', dest='freq',
-    	type=float, help='change the cut frequency in the low pass filter. \
-    	The higher the value, the smoother the signal. (default is 850)',
-    	default=850)
     parser.add_argument('--perfect', action='store', dest='perfect',
     	type=bool, help='Do you want a perfect signal and sequence',
     	default=False)
@@ -161,7 +137,7 @@ if __name__ == '__main__':
     	type=int, help='repeat length for perfect mode',
     	default=1)
     parser.add_argument('--outali', action='store', dest='outali',
-    	type=bool, help='Do you want to output the ground-truth alignment',
+    	type=bool, help='Do you want to output the ground-truth alignment in text format',
     	default=False)
     parser.add_argument('--sigout', action='store', dest='sigout',
         type=bool, help='Do you want to output the simulated signal in text format',
@@ -177,16 +153,17 @@ if __name__ == '__main__':
     seq_list = get_seq_list(arg.input)
     id_list = get_id_list(arg.input)
     seq_chunk_list = convert_to_input(seq_list)
-
+    in_list = zip(seq_chunk_list, seq_list, id_list)
 
     #---------- deep simulator -----------#
-    in_list = zip(seq_chunk_list, seq_list, id_list)
-    func=partial(raw_to_true_signal, 
-    		repeat_alpha=arg.alpha, repeat_more=arg.more,
-    		filter_freq=arg.freq, noise_std=arg.std, perfect=arg.perfect,
-    		p_len=arg.perflen,seed=arg.seed, sigroot=arg.output, 
-    		aliroot=arg.alignment, aliout=arg.outali, template_file=arg.fast5_template, 
-            fast5_root=arg.fast5_root, sigout=arg.sigout)
+    func=partial(raw_to_true_signal, \
+        repeat_alpha=arg.alpha, repeat_more=arg.more,
+        filter_freq=arg.freq, noise_std=arg.std, perfect=arg.perfect,
+        p_len=arg.perflen,seed=arg.seed, sigroot=arg.output, 
+        aliroot=arg.alignment, aliout=arg.outali, template_file=arg.fast5_template, 
+        fast5_root=arg.fast5_root, sigout=arg.sigout)
+
+    #---------- multi process ------------#
     p = Pool(arg.threads)
     list(tqdm.tqdm(p.imap(func, in_list),total=len(in_list)))
     p.close()

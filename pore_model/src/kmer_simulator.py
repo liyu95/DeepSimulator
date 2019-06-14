@@ -49,34 +49,6 @@ def sequence_official_poremodel(sequence, kmer_poremodel):
     return kmer_means,kmer_stdvs
 
 
-
-
-def signal2fasta5(template_file, data_in, fast5_root, fast5_base):
-    uid = str(uuid.uuid4())
-    fast5_fn = os.path.join(fast5_root, 
-        fast5_base+'_'+uid+'.fast5')
-    copyfile(template_file, fast5_fn)
-    ##Open file
-    try:
-        fast5_data = h5py.File(fast5_fn, 'r+')
-    except IOError:
-        raise IOError, 'Error opening file. Likely a corrupted file.'
-
-    #Get raw data
-    try:
-        raw_dat   = fast5_data['/Raw/Reads/'].values()[0]
-        raw_attrs = raw_dat.attrs
-        del raw_dat['Signal']
-        raw_dat.create_dataset('Signal',data=data_in, dtype='i2', compression='gzip', compression_opts=9)  #-> with compression
-        raw_attrs['duration'] = data_in.size
-        raw_attrs['read_id'] = uid
-    except:
-        raise RuntimeError, (
-            'Raw data is not stored in Raw/Reads/Read_[read#] so ' +
-            'new segments cannot be identified.')
-    fast5_data.close()
-
-
 #----------- main program: sequence to raw signal --------------#
 # default parameters: 
 #     repeat_alpha=0.1
@@ -99,7 +71,7 @@ def sequence_to_true_signal(input_part, kmer_poremodel='null', perfect=0, p_len=
     else:
         #-> 1. repeat N times 
         indep_result, final_ali, event_idx = repeat_n_time(repeat_alpha, mean_result, 
-            repeat_more, seed)
+            repeat_more, seed=seed)
         np.random.seed(seed)
         event_std = np.random.uniform(-1*event_std*std_result[event_idx], event_std*std_result[event_idx])
         final_result = mean_result[event_idx] + event_std
@@ -109,20 +81,22 @@ def sequence_to_true_signal(input_part, kmer_poremodel='null', perfect=0, p_len=
             final_result = np.convolve(final_result,h)[h_start+1:-(N-h_start-1)+1]
         #-> 3. add gauss noise
         if noise_std>0:
-            final_result = final_result + add_noise(noise_std, len(final_result), seed=seed)
+            final_result = final_result + add_noise(noise_std, 
+                len(final_result), seed=seed)
     #--- make integer -------#
     final_result = np.array(final_result)
     final_result = np.array(map(int, 5.7*final_result+14))
-    #--- write to file ------#
 
+    #--- write to file ------#
     # write the fast5 file
     signal2fasta5(template_file, final_result, fast5_root, 
         sigroot.split('/')[-1]+'_{}'.format(seq_name))
     if sigout:
         write_output(final_result, sigroot+'_{}.txt'.format(seq_name))
-    if not arg.perfect:
+    if not perfect:
         if aliout:
             write_alignment(final_ali, aliroot+'_{}.ali'.format(seq_name))
+
 
 
 #=================== main =======================#
@@ -171,7 +145,7 @@ if __name__ == '__main__':
         type=int, help='repeat length for perfect mode',
         default=1)
     parser.add_argument('--outali', action='store', dest='outali',
-        type=bool, help='Do you want to output the ground-truth alignment',
+        type=bool, help='Do you want to output the ground-truth alignment in text format',
         default=False)
     parser.add_argument('--sigout', action='store', dest='sigout',
         type=bool, help='Do you want to output the simulated signal in text format',
@@ -195,8 +169,8 @@ if __name__ == '__main__':
     func=partial(sequence_to_true_signal, \
         kmer_poremodel=kmer_poremodel, perfect=arg.perfect, p_len=arg.perflen, \
         event_std=arg.event_std, filter_freq=arg.filter_freq, noise_std=arg.noise_std, \
-        repeat_alpha=arg.alpha, repeat_more=arg.more, sigroot=arg.output, 
-        aliroot=arg.alignment, seed=arg.seed, aliout=arg.outali, template_file=arg.fast5_template, 
+        repeat_alpha=arg.alpha, repeat_more=arg.more, sigroot=arg.output, \
+        aliroot=arg.alignment, seed=arg.seed, aliout=arg.outali, template_file=arg.fast5_template, \
         fast5_root=arg.fast5_root, sigout=arg.sigout)
 
     #---------- multi process ------------#
