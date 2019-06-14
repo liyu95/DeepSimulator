@@ -155,7 +155,7 @@ if __name__ == '__main__':
     #---------- deep simulator -----------#
     func=partial(raw_to_true_signal, \
         repeat_alpha=arg.alpha, repeat_more=arg.more,
-        filter_freq=arg.freq, noise_std=arg.std, perfect=arg.perfect,
+        filter_freq=arg.freq, noise_std=arg.noise_std, perfect=arg.perfect,
         p_len=arg.perflen,seed=arg.seed, sigroot=arg.output, 
         aliroot=arg.alignment, aliout=arg.outali, template_file=arg.fast5_template, 
         fast5_root=arg.fast5_root, sigout=arg.sigout)

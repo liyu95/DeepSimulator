@@ -6,7 +6,7 @@ function usage()
 	echo "DeepSimulator v0.98 [Jun-06-2019] "
 	echo "    A Deep Learning based Nanopore simulator which can simulate the process of Nanopore sequencing. "
 	echo ""
-	echo "USAGE:  ./deep_simulator.sh <-i input_genome> [-o out_root] [-c CPU_num] [-S random_seed] "
+	echo "USAGE:  ./deep_simulator.sh <-i input_genome> [-o out_root] [-c CPU_num] [-S random_seed] [-B basecaller] "
 	echo "                [-n read_num] [-K coverage] [-l read_len_mean] [-C cirular_genome] [-m sample_mode] "
 	echo "                [-M simulator] [-e event_std] [-u tune_sampling] [-O out_align] [-G sig_out]"
 	echo "                [-f filter_freq] [-s signal_std] [-P perfect] [-H home] "
@@ -23,26 +23,29 @@ function usage()
 	echo "-S random_seed    : Random seed for controling the simulation process. [default = 0]"
 	echo "                    0 for a random seed. Use other number for a fixed seed for reproducibility. "
 	echo ""
+	echo "-B basecaller     : Choose from the following basecaller for the basecalling process. [default = 1] "
+	echo "                    1: guppy_gpu, 2: guppy_cpu, 3: albacore."
+	echo ""
 	echo "***** optional arguments (read-level) *****"
-	echo "-n read_num       : the number of reads need to be simulated. [default = 100] "
+	echo "-n read_num       : The number of reads need to be simulated. [default = 100] "
 	echo "                    Set -1 to simulate the whole input sequence without cut (not suitable for genome-level). "
 	echo ""
-	echo "-K coverage       : this parameter is converted to number of read in the program. [default = 0] "
-	echo "                    if both K and n are given, we use the larger one."
+	echo "-K coverage       : This parameter is converted to number of read in the program. [default = 0] "
+	echo "                    If both K and n are given, we use the larger one."
 	echo ""
-	echo "-l read_len_mean  : this parameter is used to control the read length mean. [default=8000] "
+	echo "-l read_len_mean  : This parameter is used to control the read length mean. [default=8000] "
 	echo ""
 	echo "-C cirular_genome : 0 for linear genome and 1 for circular genome. [default = 0] "
 	echo ""
-	echo "-m sample_mode    : choose from the following distribution for the read length. [default = 3] "
+	echo "-m sample_mode    : Choose from the following distribution for the read length. [default = 3] "
 	echo "                    1: beta_distribution, 2: alpha_distribution, 3: mixed_gamma_dis. "
 	echo ""
 	echo "***** optional arguments (event-signal) *****"
-	echo "-M simulator      : choose context-dependent(0) or context-independent(1) simulator to generate event. [default = 1] "
+	echo "-M simulator      : Choose context-dependent(0) or context-independent(1) simulator to generate event. [default = 1] "
 	echo ""
-	echo "-e event_std      : set the standard deviation (std) of the random noise of the event. [default = 1.0] "
+	echo "-e event_std      : Set the standard deviation (std) of the random noise of the event. [default = 1.0] "
 	echo ""
-	echo "-u tune_sampling  : tuning sampling rate to around eight for each event. [default = 1 to tune] "
+	echo "-u tune_sampling  : Tuning sampling rate to around eight for each event. [default = 1 to tune] "
 	echo "                    Here eight is determined by 4000/450, where 4KHz is the signal sampling frequency, "
 	echo "                    and 450 is the bases per second to pass the nanopore. "
 	echo ""
@@ -51,20 +54,18 @@ function usage()
 	echo "-G out_signal     : Output simulated signal in txt format. [default = 0 NOT to output] "
 	echo ""
 	echo "***** optional arguments (signal-signal) *****"
-	echo "-f filter_freq    : set the frequency for the low-pass filter. [default = 850] "
+	echo "-f filter_freq    : Set the frequency for the low-pass filter. [default = 950] "
 	echo "                    a higher frequency value would result in better base-calling accuracy "
 	echo ""
-	echo "-s signal_std     : set the standard deviation (std) of the random noise of the signal. [default = 1.5] "
-	echo "                    '1.0' would give the base-calling accuracy around 92\%, "
-	echo "                    '1.5' would give the base-calling accuracy around 90\%, "
-	echo "                    '2.0' would give the base-calling accuracy around 85\%, "
+	echo "-s signal_std     : Set the standard deviation (std) of the random noise of the signal. [default = 1.0] "
+	echo "                    [hint]: tune event_std, filter_freq and signal_std to simulate different sequencing qualities. "
 	echo ""
 	echo "-P perfect        : 0 for normal mode (with length repeat and random noise). [default = 0]"
 	echo "                    1 for perfect pore model (without 'event length repeat' and 'signal random noise'). "
 	echo "                    2 for generating almost perfect reads without any randomness in signals (equal to -e 0 -f 0 -s 0). "
 	echo ""
 	echo "***** home directory *****"
-	echo "-H home           : home directory of DeepSimulator. [default = 'current directory'] "
+	echo "-H home           : Home directory of DeepSimulator. [default = 'current directory'] "
 	echo ""
 	exit 1
 }
@@ -94,6 +95,7 @@ out_root=""
 #------- optioanl parameters -----------#
 THREAD_NUM=8        #-> this is the thread (or, CPU) number
 RANDOM_SEED=0       #-> random seed for controling sampling, for reproducibility. default: [0]
+BASE_CALLER=1       #-> choose from the following basecaller: 1: guppy_gpu, 2: guppy_cpu, 3: albacore. default: [1]
 #------- read-level parameter ----------#
 SAMPLE_NUM=100      #-> by default, we simulate 100 reads
 COVERAGE=0          #-> the coverage parameter, we simulate read whichever the larger, SAMPLE_NUM or the number computed from coverage
@@ -107,8 +109,8 @@ TUNE_SAMPLING=1     #-> 1 for tuning sampling rate to around 8. default: [1]
 ALIGN_OUT=0         #-> 1 for the output of ground-truth warping path between simulated signal and event. default: [0]
 SIG_OUT=0           #-> 1 to output the signal in text format
 #------- signal-level parameter --------#
-FILTER_FREQ=850     #-> set the frequency for the low-pass filter. default = 850
-NOISE_STD=1.5       #-> set the std of random noise of the signal, default = 1.5
+FILTER_FREQ=950     #-> set the frequency for the low-pass filter. default = 950
+NOISE_STD=1.0       #-> set the std of random noise of the signal, default = 1.0
 #-> perfect mode
 PERFECT_MODE=0      #-> 0 for normal mode (with length repeat and random noise). [default = 0]
                     #-> 1 for perfect context-dependent pore model (without length repeat and random noise).
@@ -118,7 +120,7 @@ home=$curdir
 
 
 #------- parse arguments ---------------#
-while getopts ":i:o:c:S:n:K:l:C:m:M:e:u:O:G:f:s:P:H:" opt;
+while getopts ":i:o:c:S:B:n:K:l:C:m:M:e:u:O:G:f:s:P:H:" opt;
 do
 	case $opt in
 	#-> required arguments
@@ -134,6 +136,9 @@ do
 		;;
 	S)
 		RANDOM_SEED=$OPTARG
+		;;
+	B)
+		BASE_CALLER=$OPTARG
 		;;
 	#-> read-level arguments
 	n)
@@ -315,8 +320,14 @@ then
 fi
 #-> official kmer model
 model_file=template_median68pA.model
+#-> default fast5 template
+fast5_template=template.fast5
 
 #--------- run different mode of simulator -------------#
+echo "Key parameters for simulation are shown below "
+echo "    event_std    : $EVENT_STD "
+echo "    filter_freq  : $FILTER_FREQ "
+echo "    signal_std   : $NOISE_STD "
 rm -rf $FILENAME/fast5/*
 mkdir -p $FILENAME/fast5
 if [ $SIMULATOR_MODE -eq 0 ]
@@ -334,7 +345,7 @@ then
 		-S $RANDOM_SEED \
 		-u $TUNE_SAMPLING \
 		-F $FILENAME/fast5 \
-		-T $home/util/template.fast5 \
+		-T $home/util/$fast5_template \
 		$perf_mode $align_out $sig_out
 	source deactivate
 else
@@ -350,30 +361,54 @@ else
 		-S $RANDOM_SEED \
 		-u $TUNE_SAMPLING \
 		-F $FILENAME/fast5 \
-		-T $home/util/template.fast5 \
+		-T $home/util/$fast5_template \
 		$perf_mode $align_out $sig_out
 	source deactivate
 fi
 echo "Finished generate the simulated signals and fast5 files!"
 
 #--------- base-calling ----------------#
-# basecalling using albacore
-echo "Running Albacore..."
+#-> guppy version
+guppy=guppy_3.1.5
+# basecalling using guppy_gpu by dfault
+echo "Running Basecalling..."
 FAST5_DIR="$FILENAME/fast5"
 FASTQ_DIR="$FILENAME/fastq"
 rm -rf $FASTQ_DIR/*
 mkdir -p $FASTQ_DIR
-source activate basecall
-read_fast5_basecaller.py -i $FAST5_DIR -s $FASTQ_DIR \
-	-c r94_450bps_linear.cfg -o fastq -t $THREAD_NUM
-source deactivate
+# run different base-callers
+if [ $BASE_CALLER -eq 1 ]
+then
+	echo "   Basecalling with Guppy_GPU..."
+	$home/$guppy/ont-guppy/bin/guppy_basecaller -r --input_path $FAST5_DIR \
+		--save_path $FASTQ_DIR -c dna_r9.4.1_450bps_hac.cfg \
+		-x auto
+elif [ $BASE_CALLER -eq 2 ]
+then
+	echo "   Basecalling with Guppy_CPU..."
+	$home/$guppy/ont-guppy-cpu/bin/guppy_basecaller -r --input_path $FAST5_DIR \
+		--save_path $FASTQ_DIR -c dna_r9.4.1_450bps_hac.cfg \
+		--cpu_threads_per_caller $THREAD_NUM --num_callers 1
+else
+	echo "   Basecalling with Albacore..."
+	source activate basecall
+	read_fast5_basecaller.py -i $FAST5_DIR -s $FASTQ_DIR \
+		-c r94_450bps_linear.cfg -o fastq -t $THREAD_NUM
+	source deactivate
+fi
 echo "Basecalling finished!"
 
 #--------- calculate accuracy ----------#
 # check result
 echo "Checking the read accuracy..."
-cat $FILENAME/fastq/workspace/pass/*.fastq > $FILENAME/pass.fastq 2>$FILENAME/err
-cat $FILENAME/fastq/workspace/fail/*.fastq > $FILENAME/fail.fastq 2>$FILENAME/err
+if [ $BASE_CALLER -eq 3 ]
+then
+	cat $FILENAME/fastq/workspace/pass/*.fastq > $FILENAME/pass.fastq 2>$FILENAME/err
+	cat $FILENAME/fastq/workspace/fail/*.fastq > $FILENAME/fail.fastq 2>$FILENAME/err
+else
+	cat $FILENAME/fastq/*.fastq > $FILENAME/pass.fastq 2>$FILENAME/err
+	touch $FILENAME/fail.fastq
+fi
 pass_num=`grep "^@" $FILENAME/pass.fastq | wc | awk '{print $1}'`
 fail_num=`grep "^@" $FILENAME/fail.fastq | wc | awk '{print $1}'`
 cat $FILENAME/pass.fastq $FILENAME/fail.fastq > $FILENAME/test.fastq
