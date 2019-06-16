@@ -59,6 +59,11 @@ cd ./DeepSimulator/
 ./pore_model.sh example/001c577a-a502-43ef-926a-b883f94d157b.true_fasta 1
 ```
 
+## Case study (case_study.sh file shows the three-step pipeline of our tool clearly)
+```
+./case_study.sh -f example/artificial_human_chr22.fasta
+```
+
 ## Simulate the signal and read for a given sequence
 ```
 ./deep_simulator.sh -i example/001c577a-a502-43ef-926a-b883f94d157b.true_fasta -n -1
