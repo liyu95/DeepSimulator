@@ -29,10 +29,13 @@ while read line; do
 	#statements
 done <  train_file.list
 mv ./*.data ./inter_data/
+rm -f log.txt
 echo "Data preprocessing finished!!"
+
 
 # run the pore model simulation part
 cd ../src
 source activate tensorflow_cdpm
 python2 main_train.py
 source deactivate
+

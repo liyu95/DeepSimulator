@@ -54,7 +54,8 @@ def sequence_official_poremodel(sequence, kmer_poremodel):
 #     noise_std=1.5
 def sequence_to_true_signal(input_part, kmer_poremodel='null', perfect=0, p_len=1,
     repeat_alpha=0.1, repeat_more=1, event_std=1.0, filter_freq=850, noise_std=1.5, 
-    sigroot='signal',aliroot='align', seed=0):
+    sigroot='signal',aliroot='align', seed=0, aliout=False, template_file='null', 
+    fast5_root='fast5', sigout=False):
     #--- unzip input args ---#
     sequence = input_part[0]
     seq_name = input_part[1]
@@ -66,7 +67,7 @@ def sequence_to_true_signal(input_part, kmer_poremodel='null', perfect=0, p_len=
     else:
         #-> 1. repeat N times 
         indep_result, final_ali, event_idx = repeat_n_time(repeat_alpha, mean_result, 
-            repeat_more, seed)
+            repeat_more, seed=seed)
         np.random.seed(seed)
         event_std = np.random.uniform(-1*event_std*std_result[event_idx], event_std*std_result[event_idx])
         final_result = mean_result[event_idx] + event_std
@@ -76,14 +77,22 @@ def sequence_to_true_signal(input_part, kmer_poremodel='null', perfect=0, p_len=
             final_result = np.convolve(final_result,h)[h_start+1:-(N-h_start-1)+1]
         #-> 3. add gauss noise
         if noise_std>0:
-            final_result = final_result + add_noise(noise_std, len(final_result), seed=seed)
+            final_result = final_result + add_noise(noise_std, 
+                len(final_result), seed=seed)
     #--- make integer -------#
     final_result = np.array(final_result)
     final_result = np.array(map(int, 5.7*final_result+14))
+
     #--- write to file ------#
-    write_output(final_result, sigroot+'_{}.txt'.format(seq_name))
-    if not arg.perfect:
-        write_alignment(final_ali, aliroot+'_{}.ali'.format(seq_name))
+    # write the fast5 file
+    signal2fasta5(template_file, final_result, fast5_root, 
+        sigroot.split('/')[-1]+'_{}'.format(seq_name))
+    if sigout:
+        write_output(final_result, sigroot+'_{}.txt'.format(seq_name))
+    if not perfect:
+        if aliout:
+            write_alignment(final_ali, aliroot+'_{}.ali'.format(seq_name))
+
 
 
 #=================== main =======================#
@@ -131,6 +140,16 @@ if __name__ == '__main__':
     parser.add_argument('--perflen', action='store', dest='perflen',
         type=int, help='repeat length for perfect mode',
         default=1)
+    parser.add_argument('--outali', action='store', dest='outali',
+        type=bool, help='Do you want to output the ground-truth alignment in text format',
+        default=False)
+    parser.add_argument('--sigout', action='store', dest='sigout',
+        type=bool, help='Do you want to output the simulated signal in text format',
+        default=False)
+    parser.add_argument('-F', action='store', dest='fast5_root', required=True,
+        help='The fast5 file root')
+    parser.add_argument('-T', action='store', dest='fast5_template', required=True,
+        help='The fast5 file template')    
 
 
     #---------- input list ---------------#
@@ -146,8 +165,9 @@ if __name__ == '__main__':
     func=partial(sequence_to_true_signal, \
         kmer_poremodel=kmer_poremodel, perfect=arg.perfect, p_len=arg.perflen, \
         event_std=arg.event_std, filter_freq=arg.filter_freq, noise_std=arg.noise_std, \
-        repeat_alpha=arg.alpha, repeat_more=arg.more, sigroot=arg.output, 
-        aliroot=arg.alignment, seed=arg.seed)
+        repeat_alpha=arg.alpha, repeat_more=arg.more, sigroot=arg.output, \
+        aliroot=arg.alignment, seed=arg.seed, aliout=arg.outali, template_file=arg.fast5_template, \
+        fast5_root=arg.fast5_root, sigout=arg.sigout)
 
     #---------- multi process ------------#
     p = Pool(arg.threads)
