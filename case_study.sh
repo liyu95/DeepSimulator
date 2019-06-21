@@ -18,6 +18,9 @@ FILENAME="${FILE_N%.*}"
 NUM=$(fgrep -o '>' $FULLFILE | wc -l)
 PREFIX="signal"
 
+# CPU number
+THREADNUM=8
+
 # the input should be a fasta file
 # we should make a tmp directory named after the input file to
 # store the tmp files
@@ -49,7 +52,7 @@ python2 ./util/genome_sampling.py \
 echo "Finished the preprocessing step!"
 echo "Running the context-dependent pore model..."
 rm -rf $FILENAME/signal/*
-mkdir -p ./signal
+mkdir -p $FILENAME/signal
 rm -rf $FILENAME/align/*
 mkdir -p $FILENAME/align
 rm -rf $FILENAME/fast5/*
@@ -62,7 +65,7 @@ python2 ./pore_model/src/context_simulator.py \
 	-i $FILENAME/sampled_read.fasta \
 	-p $FILENAME/signal/signal \
 	-l $FILENAME/align/align \
-	-t 32 \
+	-t $THREADNUM \
 	-f 950 -s 1.0 \
 	-S 0 \
 	-u 1 \
@@ -91,7 +94,7 @@ FASTQ_DIR="$FILENAME/fastq"
 rm -rf $FASTQ_DIR/*
 mkdir -p $FASTQ_DIR
 read_fast5_basecaller.py -i $FAST5_DIR -s $FASTQ_DIR \
-	-c r94_450bps_linear.cfg -o fastq -t 56
+	-c r94_450bps_linear.cfg -o fastq -t $THREADNUM
 
 source activate tensorflow_cdpm
 
@@ -106,7 +109,7 @@ cat $FILENAME/fastq/workspace/fail/*.fastq > $FILENAME/fail.fastq 2>$FILENAME/er
 pass_num=`grep "^@" $FILENAME/pass.fastq | wc | awk '{print $1}'`
 fail_num=`grep "^@" $FILENAME/fail.fastq | wc | awk '{print $1}'`
 cat $FILENAME/pass.fastq $FILENAME/fail.fastq > $FILENAME/test.fastq
-./util/minimap2 -Hk19 -t 32 -c $FULLFILE \
+./util/minimap2 -Hk19 -t $THREADNUM -c $FULLFILE \
 	$FILENAME/test.fastq 1> $FILENAME/mapping.paf 2> $FILENAME/err
 rm -f $FILENAME/err
 accuracy=`awk 'BEGIN{a=0;b=0}{a+=$10/$11;b++}END{print a/b}' $FILENAME/mapping.paf`
