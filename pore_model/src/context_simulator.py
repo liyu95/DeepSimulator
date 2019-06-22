@@ -37,8 +37,8 @@ def generate_chunk_seq(sequence, chunk_size=100, stride=100):
         sequence_list.append(add_chunk)
     return np.array(sequence_list)
 
-def convert_to_input(seq_list):
-    p = Pool()
+def convert_to_input(seq_list, threads):
+    p = Pool(threads)
     encoding_list = map(sequence_encoding, seq_list)
     seq_chunk_list = p.map(generate_chunk_seq, encoding_list)
     p.close()
@@ -149,7 +149,7 @@ if __name__ == '__main__':
     arg = parser.parse_args()
     seq_list = get_seq_list(arg.input)
     id_list = get_id_list(arg.input)
-    seq_chunk_list = convert_to_input(seq_list)
+    seq_chunk_list = convert_to_input(seq_list, arg.threads)
     in_list = zip(seq_chunk_list, seq_list, id_list)
 
     #---------- deep simulator -----------#

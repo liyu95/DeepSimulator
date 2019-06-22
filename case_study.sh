@@ -19,7 +19,7 @@ NUM=$(fgrep -o '>' $FULLFILE | wc -l)
 PREFIX="signal"
 
 # CPU number
-THREADNUM=8
+THREADNUM=32
 
 # the input should be a fasta file
 # we should make a tmp directory named after the input file to
