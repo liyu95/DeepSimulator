@@ -3,7 +3,7 @@
 # ----- usage ------ #
 function usage()
 {
-	echo "DeepSimulator v0.98 [Jun-06-2019] "
+	echo "DeepSimulator v1.5 [Jun-29-2019] "
 	echo "    A Deep Learning based Nanopore simulator which can simulate the process of Nanopore sequencing. "
 	echo ""
 	echo "USAGE:  ./deep_simulator.sh <-i input_genome> [-o out_root] [-c CPU_num] [-S random_seed] [-B basecaller] "
