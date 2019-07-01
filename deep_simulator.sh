@@ -203,8 +203,9 @@ done
 #---------------------------------------------------------#
 ##### ===== Part 0: initial argument check ====== #########
 #---------------------------------------------------------#
-
+source $CONDA_PREFIX/etc/profile.d/conda.sh
 # ------ check home directory ---------- #
+
 if [ ! -d "$home" ]
 then
 	echo "home directory $home not exist " >&2
@@ -246,12 +247,12 @@ PREALI="align"
 # we should make a tmp directory named after the input file to
 # store the tmp files
 echo "Pre-process input genome..."
-source activate tensorflow_cdpm
+conda activate tensorflow_cdpm
 python2 $home/util/genome_preprocess.py \
 	-i $FULLFILE \
 	-o $FILENAME/processed_genome \
 	-r 1
-source deactivate
+conda deactivate
 echo "Pre-process input genome done!"
 
 # preprocessing, sampling the read
@@ -264,7 +265,7 @@ then
 fi
 if [ $SAMPLE_NUM -gt 0 ]
 then
-	source activate tensorflow_cdpm
+	conda activate tensorflow_cdpm
 	python2 $home/util/genome_sampling.py \
 		-i $FILENAME/processed_genome \
 		-p $FILENAME/sampled_read \
@@ -274,7 +275,7 @@ then
 		-d $SAMPLE_MODE \
 		-S $RANDOM_SEED \
 		$circular
-	source deactivate
+	conda deactivate
 else
 	cp $FILENAME/processed_genome $FILENAME/sampled_read.fasta
 fi
@@ -282,7 +283,7 @@ echo "Finished the preprocessing step!"
 
 # pore model translation
 # convert the signal to the original range
-# signal duplication 
+# signal duplication
 # done within pore model
 rm -rf $FILENAME/signal/*
 if [ $SIG_OUT -eq 1 ]
@@ -334,7 +335,7 @@ if [ $SIMULATOR_MODE -eq 0 ]
 then
 	echo "Running the context-dependent pore model..."
 	#-> context-dependent simulator
-	source activate tensorflow_cdpm
+	conda activate tensorflow_cdpm
 	export DeepSimulatorHome=$home
 	python2 $home/pore_model/src/context_simulator.py \
 		-i $FILENAME/sampled_read.fasta \
@@ -347,11 +348,11 @@ then
 		-F $FILENAME/fast5 \
 		-T $home/util/$fast5_template \
 		$perf_mode $align_out $sig_out
-	source deactivate
+	conda deactivate
 else
 	echo "Running the context-independent pore model..."
 	#-> contect-independent simulator
-	source activate tensorflow_cdpm
+	conda activate tensorflow_cdpm
 	python2 $home/pore_model/src/kmer_simulator.py \
 		-i $FILENAME/sampled_read.fasta \
 		-p $FILENAME/signal/$PREFIX \
@@ -363,7 +364,7 @@ else
 		-F $FILENAME/fast5 \
 		-T $home/util/$fast5_template \
 		$perf_mode $align_out $sig_out
-	source deactivate
+	conda deactivate
 fi
 echo "Finished generate the simulated signals and fast5 files!"
 
@@ -391,10 +392,10 @@ then
 		--cpu_threads_per_caller $THREAD_NUM --num_callers 1
 else
 	echo "   Basecalling with Albacore..."
-	source activate basecall
+	conda activate basecall
 	read_fast5_basecaller.py -i $FAST5_DIR -s $FASTQ_DIR \
 		-c r94_450bps_linear.cfg -o fastq -t $THREAD_NUM
-	source deactivate
+	conda deactivate
 fi
 echo "Basecalling finished!"
 
@@ -425,4 +426,3 @@ rm -f $FILENAME/test.fastq
 
 #---------- exit -----------#
 exit 0
-

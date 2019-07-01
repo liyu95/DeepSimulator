@@ -6,11 +6,11 @@ while [[ -n $1 ]]; do
         case $1 in
                 -i | --input )       shift
                                                 INPUT=$1
-                                                ;;                      
+                                                ;;
         esac
         shift
 done
-
+source $CONDA_PREFIX/etc/profile.d/conda.sh
 
 # preprocessing
 echo "Preprocess data..."
@@ -35,7 +35,6 @@ echo "Data preprocessing finished!!"
 
 # run the pore model simulation part
 cd ../src
-source activate tensorflow_cdpm
+conda activate tensorflow_cdpm
 python2 main_train.py
-source deactivate
-
+conda deactivate
