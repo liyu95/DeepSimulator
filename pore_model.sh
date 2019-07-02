@@ -7,7 +7,7 @@ then
 	echo "                         1 for kmer official pore_model "
 	exit
 fi
-
+source $CONDA_PREFIX/etc/profile.d/conda.sh
 
 #------ read input arguments ---------#
 FULLFILE=$1
@@ -31,25 +31,24 @@ mkdir -p $tmp_root
 if [ $CONTEXT -eq 0 ]
 then
 	#-> context-dependent pore model
-	source activate tensorflow_cdpm
+	conda activate tensorflow_cdpm
 	export DeepSimulatorHome=$home
 	python2 $home/pore_model/src/context_simulator.py \
 		-i $FULLFILE -p $PREFIX -l $PREFIX -t $THREAD_NUM \
 		-F $tmp_root -T $home/util/$TEMPLATE_FILE \
 		--perfect True --sigout True
-	source deactivate
+	conda deactivate
 else
 	#-> official kmer pore model
-	source activate tensorflow_cdpm
+	conda activate tensorflow_cdpm
 	python2 $home/pore_model/src/kmer_simulator.py \
 		-i $FULLFILE -p $PREFIX -l $PREFIX -t $THREAD_NUM \
 		-F $tmp_root -T $home/util/$TEMPLATE_FILE \
 		-m $home/pore_model/model/$MODEL_FILE \
 		--perfect True --sigout True
-	source deactivate
+	conda deactivate
 fi
 
 
 #---- remove tmp_dir ---#
 rm -rf $tmp_root
-

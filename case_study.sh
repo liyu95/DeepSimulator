@@ -6,7 +6,7 @@ while [[ -n $1 ]]; do
         case $1 in
                 -f | --filename )       shift
                                                 FULLFILE=$1
-                                                ;;                      
+                                                ;;
         esac
         shift
 done
@@ -22,8 +22,8 @@ PREFIX="signal"
 # we should make a tmp directory named after the input file to
 # store the tmp files
 mkdir -p $FILENAME
-
-source activate tensorflow_cdpm
+source $CONDA_PREFIX/etc/profile.d/conda.sh
+conda activate tensorflow_cdpm
 # preprocessing, sampling the read
 # satisfy the converage and length distritubtion requirement
 echo "Executing the preprocessing step..."
@@ -40,11 +40,11 @@ python2 ./util/genome_sampling.py \
 	-K 0 \
 	-l 8000 \
 	-d 3 \
-	-S 0 
+	-S 0
 
 # pore model translation
 # convert the signal to the original range
-# signal duplication 
+# signal duplication
 # done within pore model
 echo "Finished the preprocessing step!"
 echo "Running the context-dependent pore model..."
@@ -79,13 +79,13 @@ python2 ./pore_model/src/context_simulator.py \
 # python2 ./signal_to_fast5/fast5_modify_signal.py \
 # 	-i ./signal_to_fast5/template.fast5 \
 # 	-s ${signal_dir} \
-# 	-d ./fast5 
+# 	-d ./fast5
 
 # basecalling using albacore
 
 echo "Finished format converting!"
 echo "Running Albacore..."
-source activate basecall
+conda activate basecall
 FAST5_DIR="$FILENAME/fast5"
 FASTQ_DIR="$FILENAME/fastq"
 rm -rf $FASTQ_DIR/*
@@ -93,7 +93,7 @@ mkdir -p $FASTQ_DIR
 read_fast5_basecaller.py -i $FAST5_DIR -s $FASTQ_DIR \
 	-c r94_450bps_linear.cfg -o fastq -t 56
 
-source activate tensorflow_cdpm
+conda activate tensorflow_cdpm
 
 # check result
 echo "Basecalling finished!"
