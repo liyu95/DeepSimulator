@@ -8,7 +8,6 @@ import multiprocessing
 import os
 import argparse
 import tqdm
-import random 
 
 
 #----- use GPU for TensorFlow -----#
