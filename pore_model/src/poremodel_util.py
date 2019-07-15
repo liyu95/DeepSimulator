@@ -38,8 +38,8 @@ def write_alignment(result, file_name):
             temp = str(i[0]+1)+' '+str(i[1]+1)+'\n'
             f.write(temp)
 
-def signal2fasta5(template_file, data_in, fast5_root, fast5_base, seed):
-    uid = str(uuid.uuid4(int=seed))
+def signal2fasta5(template_file, data_in, fast5_root, fast5_base):
+    uid = str(uuid.uuid4())
     fast5_fn = os.path.join(fast5_root,
         fast5_base+'_'+uid+'.fast5')
     copyfile(template_file, fast5_fn)
