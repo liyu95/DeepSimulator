@@ -8,6 +8,7 @@ import multiprocessing
 import os
 import argparse
 import tqdm
+import random 
 
 
 #----- use GPU for TensorFlow -----#
@@ -83,8 +84,10 @@ def raw_to_true_signal(input_part,
 
     #--- write to file ------#
     # write the fast5 file
+    rd = random.Random()
+    rd.seed(seed)
     signal2fasta5(template_file, final_result, fast5_root, 
-        sigroot.split('/')[-1]+'_{}'.format(seq_name))
+        sigroot.split('/')[-1]+'_{}'.format(seq_name), rd.getrandbits(128))
     if sigout:
         write_output(final_result, sigroot+'_{}.txt'.format(seq_name))
     if not perfect:
