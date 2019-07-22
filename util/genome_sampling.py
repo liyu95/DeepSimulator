@@ -140,7 +140,7 @@ if __name__ == '__main__':
 	arg = parser.parse_args()
 	random.seed(arg.seed)
 	genome = load_genome(arg.input)
-	seq_num_c = int(arg.coverage*len(genome)/4400)
+	seq_num_c = int(arg.coverage*len(genome)/arg.len_mean)
 	seq_num = arg.seq_num
 	if seq_num_c>seq_num:
 		seq_num = seq_num_c
