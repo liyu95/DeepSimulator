@@ -6,6 +6,7 @@ import multiprocessing
 import argparse
 from tqdm import *
 
+
 #--------------- step 0: official kmer pore model ---------#
 #-> load plain text file for official pore model
 #   data structure is a dict with 4096 dims (6mer 4^6)

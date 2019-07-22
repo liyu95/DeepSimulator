@@ -147,7 +147,9 @@ pred = model_graph(input_seq, input_seq_3, input_seq_5, kr, phase)
 
 def model_whole_set_check(seq, batch_size=64):
 	sess = tf.Session(config=tf.ConfigProto(
-		allow_soft_placement=True))
+		allow_soft_placement=True,
+		intra_op_parallelism_threads=1,
+		inter_op_parallelism_threads=1))
 	sess.run(tf.global_variables_initializer())
 	saver = tf.train.Saver()
 	saver.restore(sess, model_dir)
