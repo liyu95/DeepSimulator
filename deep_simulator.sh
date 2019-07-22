@@ -116,7 +116,7 @@ PERFECT_MODE=0      #-> 0 for normal mode (with length repeat and random noise).
                     #-> 1 for perfect context-dependent pore model (without length repeat and random noise).
                     #-> 2 for generating almost perfect reads without any randomness in signals (equal to -e 0 -f 0 -s 0).
 #------- home directory ----------------#
-home=$curdir
+home=`dirname $0`   #-> home directory
 
 
 #------- parse arguments ---------------#
