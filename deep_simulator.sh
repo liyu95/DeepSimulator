@@ -54,8 +54,8 @@ function usage()
 	echo "-G out_signal     : Output simulated signal in txt format. [default = 0 NOT to output] "
 	echo ""
 	echo "***** optional arguments (signal-signal) *****"
-	echo "-f filter_freq    : Set the frequency for the low-pass filter. [default = 950] "
-	echo "                    [hint]: a higher frequency value would result in better base-calling accuracy. "
+	echo "-f filter_freq    : Set the cutoff frequency for the low-pass filter. [default = 950] "
+	echo "                    [hint]: a higher cutoff frequency value would result in better base-calling accuracy. "
 	echo ""
 	echo "-s signal_std     : Set the standard deviation (std) of the random noise of the signal. [default = 1.0] "
 	echo "                    [hint]: tune event_std, filter_freq and signal_std to simulate different sequencing qualities. "
@@ -109,7 +109,7 @@ TUNE_SAMPLING=1     #-> 1 for tuning sampling rate to around 8. default: [1]
 ALIGN_OUT=0         #-> 1 for the output of ground-truth warping path between simulated signal and event. default: [0]
 SIG_OUT=0           #-> 1 to output the signal in text format
 #------- signal-level parameter --------#
-FILTER_FREQ=950     #-> set the frequency for the low-pass filter. default = 950
+FILTER_FREQ=950     #-> set the cutoff frequency for the low-pass filter. default = 950
 NOISE_STD=1.0       #-> set the std of random noise of the signal, default = 1.0
 #-> perfect mode
 PERFECT_MODE=0      #-> 0 for normal mode (with length repeat and random noise). [default = 0]
