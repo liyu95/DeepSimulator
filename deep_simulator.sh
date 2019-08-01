@@ -61,8 +61,7 @@ function usage()
 	echo "                    [hint]: tune event_std, filter_freq and signal_std to simulate different sequencing qualities. "
 	echo ""
 	echo "-P perfect        : 0 for normal mode (with length repeat and random noise). [default = 0]"
-	echo "                    1 for perfect pore model (without 'event length repeat' and 'signal random noise'). "
-	echo "                    2 for generating almost perfect reads without any randomness in signals (equal to -e 0 -f 0 -s 0). "
+	echo "                    1 for generating almost perfect reads without any randomness in signals (equal to -e 0 -f 0 -s 0). "
 	echo ""
 	echo "***** home directory *****"
 	echo "-H home           : Home directory of DeepSimulator. [default = 'current directory'] "
@@ -113,8 +112,7 @@ FILTER_FREQ=950     #-> set the cutoff frequency for the low-pass filter. defaul
 NOISE_STD=1.0       #-> set the std of random noise of the signal, default = 1.0
 #-> perfect mode
 PERFECT_MODE=0      #-> 0 for normal mode (with length repeat and random noise). [default = 0]
-                    #-> 1 for perfect context-dependent pore model (without length repeat and random noise).
-                    #-> 2 for generating almost perfect reads without any randomness in signals (equal to -e 0 -f 0 -s 0).
+                    #-> 1 for generating almost perfect reads without any randomness in signals (equal to -e 0 -f 0 -s 0).
 #------- home directory ----------------#
 home=`dirname $0`   #-> home directory
 
@@ -310,9 +308,6 @@ fi
 #-> perfect mode
 perf_mode=""
 if [ $PERFECT_MODE -eq 1 ]
-then
-	perf_mode="--perfect True"
-elif [ $PERFECT_MODE -eq 2 ]
 then
 	EVENT_STD=0
 	FILTER_FREQ=0
