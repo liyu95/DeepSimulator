@@ -14,6 +14,7 @@ FULLFILE=$1
 CONTEXT=$2
 PREFIX=signal
 THREAD_NUM=1
+REPEAT_LEN=1
 MODEL_FILE=template_median68pA.model
 TEMPLATE_FILE=template.fast5
 home=`pwd`
@@ -36,7 +37,7 @@ then
 	python2 $home/pore_model/src/context_simulator.py \
 		-i $FULLFILE -p $PREFIX -l $PREFIX -t $THREAD_NUM \
 		-F $tmp_root -T $home/util/$TEMPLATE_FILE \
-		--perfect True --sigout True
+		--sigout True --perfect True --perflen $REPEAT_LEN
 	source deactivate
 else
 	#-> official kmer pore model
@@ -45,7 +46,7 @@ else
 		-i $FULLFILE -p $PREFIX -l $PREFIX -t $THREAD_NUM \
 		-F $tmp_root -T $home/util/$TEMPLATE_FILE \
 		-m $home/pore_model/model/$MODEL_FILE \
-		--perfect True --sigout True
+		--sigout True --perfect True --perflen $REPEAT_LEN
 	source deactivate
 fi
 
