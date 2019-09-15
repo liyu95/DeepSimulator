@@ -12,6 +12,7 @@ pip install scipy==0.18.1
 pip install h5py==2.7.1
 pip install numpy==1.13.1
 pip install scikit-learn==0.20.3
+pip install biopython==1.74
 source deactivate
 
 #-> 2. install basecaller
