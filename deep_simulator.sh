@@ -3,10 +3,10 @@
 # ----- usage ------ #
 function usage()
 {
-	echo "DeepSimulator v1.5 [Jun-29-2019] "
+	echo "DeepSimulator v1.5 [Sep-26-2019] "
 	echo "    A Deep Learning based Nanopore simulator which can simulate the process of Nanopore sequencing. "
 	echo ""
-	echo "USAGE:  ./deep_simulator.sh <-i input_genome> [-o out_root] [-c CPU_num] [-S random_seed] [-B basecaller] "
+	echo "USAGE:  ./deep_simulator.sh <-i input_genome> [-o out_root] [-D multi_fasta] [-c CPU_num] [-S random_seed] [-B basecaller] "
 	echo "                [-n read_num] [-K coverage] [-l read_len_mean] [-C cirular_genome] [-m sample_mode] "
 	echo "                [-M simulator] [-e event_std] [-u tune_sampling] [-O out_align] [-G sig_out]"
 	echo "                [-f filter_freq] [-s signal_std] [-P perfect] [-H home] "
@@ -30,6 +30,9 @@ function usage()
 	echo "-n read_num       : The number of reads need to be simulated. [default = 100] "
 	echo "                    Set -1 to simulate the whole input sequence without cut (not suitable for genome-level). "
 	echo ""
+	echo "-D multi_fasta    : Whether the input fasta contains multi discontinuous sequences. [default = 1, separate different sequences] "
+	echo "                    Set 0 to concatenate different sequences. "
+	echo ""
 	echo "-K coverage       : This parameter is converted to number of read in the program. [default = 0] "
 	echo "                    If both K and n are given, we use the larger one."
 	echo ""
@@ -40,7 +43,7 @@ function usage()
 	echo "-m sample_mode    : Choose from the following distribution for the read length. [default = 3] "
 	echo "                    1: beta_distribution, 2: alpha_distribution, 3: mixed_gamma_dis. "
 	echo ""
-	echo "***** optional arguments (event-level) *****"
+	echo "***** optional arguments (event-signal) *****"
 	echo "-M simulator      : Choose context-dependent(0) or context-independent(1) simulator to generate event. [default = 1] "
 	echo ""
 	echo "-e event_std      : Set the standard deviation (std) of the random noise of the event. [default = 1.0] "
@@ -53,15 +56,16 @@ function usage()
 	echo ""
 	echo "-G out_signal     : Output simulated signal in txt format. [default = 0 NOT to output] "
 	echo ""
-	echo "***** optional arguments (signal-level) *****"
-	echo "-f filter_freq    : Set the cutoff frequency for the low-pass filter. [default = 950] "
-	echo "                    [hint]: a higher cutoff frequency value would result in better base-calling accuracy. "
+	echo "***** optional arguments (signal-signal) *****"
+	echo "-f filter_freq    : Set the frequency for the low-pass filter. [default = 950] "
+	echo "                    [hint]: a higher frequency value would result in better base-calling accuracy. "
 	echo ""
 	echo "-s signal_std     : Set the standard deviation (std) of the random noise of the signal. [default = 1.0] "
 	echo "                    [hint]: tune event_std, filter_freq and signal_std to simulate different sequencing qualities. "
 	echo ""
 	echo "-P perfect        : 0 for normal mode (with length repeat and random noise). [default = 0]"
-	echo "                    1 for generating almost perfect reads without any randomness in signals (equal to -e 0 -f 0 -s 0). "
+	echo "                    1 for perfect pore model (without 'event length repeat' and 'signal random noise'). "
+	echo "                    2 for generating almost perfect reads without any randomness in signals (equal to -e 0 -f 0 -s 0). "
 	echo ""
 	echo "***** home directory *****"
 	echo "-H home           : Home directory of DeepSimulator. [default = 'current directory'] "
@@ -97,6 +101,7 @@ RANDOM_SEED=0       #-> random seed for controling sampling, for reproducibility
 BASE_CALLER=1       #-> choose from the following basecaller: 1: guppy_gpu, 2: guppy_cpu, 3: albacore. default: [1]
 #------- read-level parameter ----------#
 SAMPLE_NUM=100      #-> by default, we simulate 100 reads
+SEP=1               #-> by default, we will separate different sequence in one multi-fasta file
 COVERAGE=0          #-> the coverage parameter, we simulate read whichever the larger, SAMPLE_NUM or the number computed from coverage
 LEN_MEAN=8000       #-> read length mean
 GENOME_CIRCULAR=0   #-> 0 for NOT circular and 1 for circular. default: [0]
@@ -108,17 +113,18 @@ TUNE_SAMPLING=1     #-> 1 for tuning sampling rate to around 8. default: [1]
 ALIGN_OUT=0         #-> 1 for the output of ground-truth warping path between simulated signal and event. default: [0]
 SIG_OUT=0           #-> 1 to output the signal in text format
 #------- signal-level parameter --------#
-FILTER_FREQ=950     #-> set the cutoff frequency for the low-pass filter. default = 950
+FILTER_FREQ=950     #-> set the frequency for the low-pass filter. default = 950
 NOISE_STD=1.0       #-> set the std of random noise of the signal, default = 1.0
 #-> perfect mode
 PERFECT_MODE=0      #-> 0 for normal mode (with length repeat and random noise). [default = 0]
-                    #-> 1 for generating almost perfect reads without any randomness in signals (equal to -e 0 -f 0 -s 0).
+                    #-> 1 for perfect context-dependent pore model (without length repeat and random noise).
+                    #-> 2 for generating almost perfect reads without any randomness in signals (equal to -e 0 -f 0 -s 0).
 #------- home directory ----------------#
 home=`dirname $0`   #-> home directory
 
 
 #------- parse arguments ---------------#
-while getopts ":i:o:c:S:B:n:K:l:C:m:M:e:u:O:G:f:s:P:H:" opt;
+while getopts ":i:o:D:c:S:B:n:K:l:C:m:M:e:u:O:G:f:s:P:H:" opt;
 do
 	case $opt in
 	#-> required arguments
@@ -128,6 +134,9 @@ do
 	#-> optional arguments
 	o)
 		out_root=$OPTARG
+		;;
+	D)
+		SEP=$OPTARG
 		;;
 	c)
 		THREAD_NUM=$OPTARG
@@ -248,7 +257,8 @@ source activate tensorflow_cdpm
 python2 $home/util/genome_preprocess.py \
 	-i $FULLFILE \
 	-o $FILENAME/processed_genome \
-	-r 1
+	-r 1 \
+	-m $SEP
 source deactivate
 echo "Pre-process input genome done!"
 
@@ -263,19 +273,29 @@ fi
 if [ $SAMPLE_NUM -gt 0 ]
 then
 	source activate tensorflow_cdpm
-	python2 $home/util/genome_sampling.py \
-		-i $FILENAME/processed_genome \
-		-p $FILENAME/sampled_read \
-		-n $SAMPLE_NUM \
-		-K $COVERAGE \
-		-l $LEN_MEAN \
-		-d $SAMPLE_MODE \
-		-S $RANDOM_SEED \
-		$circular
+	for file_processed_genome in `ls $FILENAME/processed_genome*`; do
+		#statements
+		# echo ${file_processed_genome}
+		python2 $home/util/genome_sampling.py \
+			-i ${file_processed_genome} \
+			-p $FILENAME/sampled_read_"$(basename -- ${file_processed_genome})" \
+			-n $SAMPLE_NUM \
+			-K $COVERAGE \
+			-l $LEN_MEAN \
+			-d $SAMPLE_MODE \
+			-S $RANDOM_SEED \
+			$circular
+	done
 	source deactivate
 else
-	cp $FILENAME/processed_genome $FILENAME/sampled_read.fasta
+	for file_processed_genome in `ls $FILENAME/processed_genome*`; do
+		#statements
+		echo ${file_processed_genome}
+		cp ${file_processed_genome} $FILENAME/sampled_read_"$(basename -- ${file_processed_genome})".fasta
+	done
 fi
+cat $FILENAME/sampled_read_* >> $FILENAME/sampled_read.fasta
+python $home/util/reindex.py -i $FILENAME/sampled_read.fasta
 echo "Finished the preprocessing step!"
 
 # pore model translation
@@ -308,6 +328,9 @@ fi
 #-> perfect mode
 perf_mode=""
 if [ $PERFECT_MODE -eq 1 ]
+then
+	perf_mode="--perfect True"
+elif [ $PERFECT_MODE -eq 2 ]
 then
 	EVENT_STD=0
 	FILTER_FREQ=0

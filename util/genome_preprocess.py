@@ -11,14 +11,29 @@ def load_genome(input_file):
 		text = f.read()
 		lines = text.splitlines()
 	sequence = filter(lambda x: '>' not in x, lines)
+	headers = filter(lambda x: '>' in x, lines)
 	sequence = map(lambda x: x.strip(), sequence)
+	sequence = filter(len, sequence)
+	seq_lens = map(len, sequence)
 	sequence = ''.join(sequence)
-	return sequence
+	return sequence, headers, seq_lens
 
-def save_genome(genome, output_file):
-	with open(output_file, 'w') as f:
-		f.write('>preprocess\n')
-		f.write(genome+'\n')
+def save_genome(genome, output_file, headers, seq_lens, multi=False):
+	# print(seq_lens)
+	if multi:
+		seq_lens = [0]+seq_lens
+		for i in range(len(headers)):
+			with open(output_file+'_{}'.format(i), 'w') as f:
+				f.write(headers[i]+'\n')
+				sequence = genome[sum(seq_lens[:i+1]):sum(seq_lens[:i+2])]
+				# print(sum(seq_lens[:i+1]))
+				# print(sum(seq_lens[:i+2]))
+				f.write(sequence+'\n')
+
+	else:
+		with open(output_file, 'w') as f:
+			f.write('>preprocess\n')
+			f.write(genome+'\n')
 
 def replace_n(genome):
 	n_index = [m.start() for m in re.finditer('N', genome)]
@@ -41,9 +56,11 @@ if __name__ == '__main__':
 	#-> optional arguments
 	parser.add_argument('-r', action='store', dest='replace',
 		default=False, type=bool, help='set if we replace the \'N\'s (default: delete the \'N\'s)')
+	parser.add_argument('-m', action='store', dest='multi',
+		default=False, type=bool, help='set to indicate the input contains multiple contigs (default: False')
 
 	arg = parser.parse_args()
-	genome = load_genome(arg.input)
+	genome, headers, seq_lens = load_genome(arg.input)
 
 	# deal with the not standard genome, containing 'N', or in lower case.
 	genome = genome.upper()
@@ -56,4 +73,4 @@ if __name__ == '__main__':
 		genome = genome.replace('N','')
 
 	# output genome
-	save_genome(genome, arg.output)
+	save_genome(genome, arg.output, headers, seq_lens, multi=arg.multi)
