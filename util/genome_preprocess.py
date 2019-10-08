@@ -3,18 +3,32 @@
 import argparse
 import numpy as np
 import re
+from Bio import SeqIO
 
 
 #------------- functions ---------------#
+# def load_genome(input_file):
+# 	with open(input_file, 'r') as f:
+# 		text = f.read()
+# 		lines = text.splitlines()
+# 	sequence = filter(lambda x: '>' not in x, lines)
+# 	headers = filter(lambda x: '>' in x, lines)
+# 	sequence = map(lambda x: x.strip(), sequence)
+# 	sequence = filter(len, sequence)
+# 	seq_lens = map(len, sequence)
+# 	sequence = ''.join(sequence)
+# 	return sequence, headers, seq_lens
+
 def load_genome(input_file):
-	with open(input_file, 'r') as f:
-		text = f.read()
-		lines = text.splitlines()
-	sequence = filter(lambda x: '>' not in x, lines)
-	headers = filter(lambda x: '>' in x, lines)
-	sequence = map(lambda x: x.strip(), sequence)
-	sequence = filter(len, sequence)
-	seq_lens = map(len, sequence)
+	id_list = list()
+	sequence_list = list()
+	for record in SeqIO.parse(input_file, "fasta"):
+		id_list.append(record.id)
+		sequence_list.append(record.seq)
+
+	sequence = list(map(str, sequence_list))
+	headers = list(map(str, id_list))
+	seq_lens = list(map(len, sequence))
 	sequence = ''.join(sequence)
 	return sequence, headers, seq_lens
 
