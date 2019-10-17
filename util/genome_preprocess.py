@@ -27,7 +27,10 @@ def load_genome(input_file):
 		sequence_list.append(record.seq)
 
 	sequence = list(map(str, sequence_list))
-	headers = list(map(str, id_list))
+	with open(input_file, 'r') as f:
+		text = f.read()
+		lines = text.splitlines()
+	headers = filter(lambda x: '>' in x, lines)
 	seq_lens = list(map(len, sequence))
 	sequence = ''.join(sequence)
 	return sequence, headers, seq_lens
