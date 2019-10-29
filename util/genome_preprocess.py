@@ -3,6 +3,7 @@
 import argparse
 import numpy as np
 import re
+import random
 from Bio import SeqIO
 
 
@@ -52,14 +53,20 @@ def save_genome(genome, output_file, headers, seq_lens, multi=False):
 			f.write('>preprocess\n')
 			f.write(genome+'\n')
 
-def replace_n(genome):
-	n_index = [m.start() for m in re.finditer('N', genome)]
-	genome_list = np.array([x for x in genome])
-	random_base = np.random.choice(['A','T','C','G'],len(n_index))
-	genome_list[n_index] = random_base
-	genome = ''.join(genome_list)
-	return genome
+# def replace_n(genome):
+# 	n_index = [m.start() for m in re.finditer('N', genome)]
+# 	genome_list = np.array([x for x in genome])
+# 	random_base = np.random.choice(['A','T','C','G'],len(n_index))
+# 	genome_list[n_index] = random_base
+# 	genome = ''.join(genome_list)
+# 	return genome
 
+def callback(matchobj):
+	return random.choice(['A','T','C','G'])
+
+def replace_n(genome):
+	genome = re.sub(r'N', callback, genome)
+	return genome
 
 #============== main =====================#
 if __name__ == '__main__':
