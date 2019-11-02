@@ -49,6 +49,8 @@ cd ./DeepSimulator/
 
 # Examples
 
+The main parameters of DeepSimulator can be referred to the Wiki: https://github.com/lykaust15/DeepSimulator/wiki/Parameters-of-DS1.5
+
 ## Context-dependent pore model
 ```
 ./pore_model.sh example/001c577a-a502-43ef-926a-b883f94d157b.true_fasta 0
