@@ -49,7 +49,11 @@ cd ./DeepSimulator/
 
 # Examples
 
-The main parameters of DeepSimulator can be referred to the Wiki: https://github.com/lykaust15/DeepSimulator/wiki/Parameters-of-DS1.5
+## The main parameters of DeepSimulator. 
+The main parameters of DeepSimulator can be referred to the Wiki: https://github.com/lykaust15/DeepSimulator/wiki/Parameters-of-DS1.5. Alternatively, the users can use the following command to print out the parameters:
+```
+./deep_simulator.sh
+```
 
 ## Context-dependent pore model
 ```
