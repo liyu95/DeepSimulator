@@ -217,7 +217,7 @@ then
 	echo "home directory $home not exist " >&2
 	exit 1
 fi
-home=`readlink -f $home`
+home=`$home/readlinkf.sh $home`
 
 #----------- check input genome  -----------#
 if [ ! -s "$FULLFILE" ]
@@ -225,7 +225,7 @@ then
 	echo "input input_genome is null !!" >&2
 	exit 1
 fi
-FULLFILE=`readlink -f $FULLFILE`
+FULLFILE=`$home/readlinkf.sh $FULLFILE`
 #-> get query_name
 fulnam=`basename $FULLFILE`
 relnam=${fulnam%.*}
@@ -236,7 +236,7 @@ then
 	out_root=${relnam}_DeepSimu
 fi
 mkdir -p $out_root
-out_root=`readlink -f $out_root`
+out_root=`$home/readlinkf.sh $out_root`
 
 
 #--------------------------------------------------------#
