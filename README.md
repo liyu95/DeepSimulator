@@ -1,6 +1,6 @@
 
 <p align="center">
-<img src="https://github.com/lykaust15/DeepSimulator/blob/master/example/DS_logo.png" width="600"/>
+<img src="https://github.com/lykaust15/DeepSimulator/blob/master/example/DS_logo.png" width="1000"/>
 </p>
 
 The first deep learning based Nanopore simulator which can simulate the process of Nanopore sequencing.
