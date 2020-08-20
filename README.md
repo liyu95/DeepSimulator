@@ -5,7 +5,7 @@
 
 The first deep learning based Nanopore simulator which can simulate the process of Nanopore sequencing.
 
-Paper: 
+Paper: <br>
 [DeepSimulator1.5: a more powerful, quicker and lighter simulator for Nanopore sequencing](https://academic.oup.com/bioinformatics/article/36/8/2578/5698265) [[PDF]](https://drive.google.com/file/d/1kwysNUmBCo6rM1LZKAd6qR2UWe9Lp2xp/view?usp=sharing)
 [DeepSimulator: a deep simulator for Nanopore sequencing](https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/bty223/4962495) [[PDF]](https://drive.google.com/open?id=1TpxZR8lAbcABHBU-Pu8S8gfhvY6vnjn_)
 
@@ -19,7 +19,7 @@ If you find this tool useful, please cite our work using the following reference
   number={8},
   pages={2578--2580},
   year={2020},
-  publisher={Oxford University Press}
+  doi = {10.1093/bioinformatics/btz963}
 }
 
 @article{deepsimulator,
@@ -30,9 +30,7 @@ If you find this tool useful, please cite our work using the following reference
     number = {17},
     pages = {2899-2908},
     year = {2018},
-    doi = {10.1093/bioinformatics/bty223},
-    URL = {http://dx.doi.org/10.1093/bioinformatics/bty223},
-    eprint = {/oup/backfile/content_public/journal/bioinformatics/34/17/10.1093_bioinformatics_bty223/2/bty223.pdf}
+    doi = {10.1093/bioinformatics/bty223}
 }
 
 ```
