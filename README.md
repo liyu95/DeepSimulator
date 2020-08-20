@@ -5,10 +5,23 @@
 
 The first deep learning based Nanopore simulator which can simulate the process of Nanopore sequencing.
 
-Paper: [DeepSimulator: a deep simulator for Nanopore sequencing](https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/bty223/4962495) [[PDF]](https://drive.google.com/open?id=1TpxZR8lAbcABHBU-Pu8S8gfhvY6vnjn_)
+Paper: 
+[DeepSimulator1.5: a more powerful, quicker and lighter simulator for Nanopore sequencing](https://academic.oup.com/bioinformatics/article/36/8/2578/5698265) [[PDF]](https://drive.google.com/file/d/1kwysNUmBCo6rM1LZKAd6qR2UWe9Lp2xp/view?usp=sharing)
+[DeepSimulator: a deep simulator for Nanopore sequencing](https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/bty223/4962495) [[PDF]](https://drive.google.com/open?id=1TpxZR8lAbcABHBU-Pu8S8gfhvY6vnjn_)
 
 If you find this tool useful, please cite our work using the following reference:
 ```
+@article{li2020deepsimulator,
+  title={DeepSimulator1. 5: a more powerful, quicker and lighter simulator for Nanopore sequencing},
+  author={Li, Yu and Wang, Sheng and Bi, Chongwei and Qiu, Zhaowen and Li, Mo and Gao, Xin},
+  journal={Bioinformatics},
+  volume={36},
+  number={8},
+  pages={2578--2580},
+  year={2020},
+  publisher={Oxford University Press}
+}
+
 @article{deepsimulator,
     author = {Li, Yu and Han, Renmin and Bi, Chongwei and Li, Mo and Wang, Sheng and Gao, Xin},
     title = {DeepSimulator: a deep simulator for Nanopore sequencing},
