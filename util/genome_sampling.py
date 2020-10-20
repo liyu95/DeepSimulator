@@ -130,7 +130,7 @@ if __name__ == '__main__':
 		calculated. We use the larger one compared with seq_num.')
 	parser.add_argument('-d', action='store', dest='dis', default=3,
 		type=int, help='choose from the following distribution: \
-		1: beta_distribution, 2: alpha_distribution, 3: mixed_gamma_dis \
+		1: beta_distribution, 2: exponential_distribution, 3: mixed_gamma_dis \
 		default: 3. If the read length drawn from the distribution is \
 		larger than the length of the genome, the value is clipped to the\
 		length of the genome')
